@@ -27,7 +27,7 @@ const Navbar = () => {
           <h1 className="text-2xl font-bold">LoanDesk</h1>
         </Link>
         {/* Desktop View */}
-        <div className="hidden md:flex justify-center items-center gap-4">
+        <div className="hidden md:flex justify-center items-center gap-6">
           <Link href="/" className="flex justify-center items-center gap-3">
             <ChartColumn className="size-4" />
             <span>Dashboard</span>

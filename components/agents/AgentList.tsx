@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/table";
 import { Agent } from "@/lib/types/agent";
 import AgentActionsDropdown from "./AgentActionsDropdown";
+import Link from "next/link";
 
 interface AgentListProps {
   agents: Agent[];
@@ -37,7 +38,14 @@ const AgentList = ({ agents, onAction }: AgentListProps) => {
             {agents.map((agent, index) => (
               <TableRow key={agent.id}>
                 <TableCell className="w-4">{index + 1}</TableCell>
-                <TableCell>{agent.name}</TableCell>
+                <TableCell>
+                  <Link
+                    href={`/agents/${agent.id}`}
+                    className="hover:underline"
+                  >
+                    {agent.name}
+                  </Link>
+                </TableCell>
                 <TableCell>{agent.email}</TableCell>
                 <TableCell>{agent.phone}</TableCell>
                 <TableCell className="text-center">0</TableCell>
