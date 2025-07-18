@@ -19,10 +19,13 @@ const Navbar = () => {
   return (
     <nav className="w-full shadow">
       <div className="p-4 flex justify-between max-w-[80rem] mx-auto">
-        <div className="flex justify-center items-center gap-2 ">
+        <Link
+          href="/"
+          className="flex justify-center items-center gap-2 cursor-pointer"
+        >
           <Wallet />
           <h1 className="text-2xl font-bold">LoanDesk</h1>
-        </div>
+        </Link>
         {/* Desktop View */}
         <div className="hidden md:flex justify-center items-center gap-4">
           <Link href="/" className="flex justify-center items-center gap-3">

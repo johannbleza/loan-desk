@@ -16,7 +16,6 @@ interface ActionCardProps {
 }
 
 const ActionCard = ({ name, desc, actions }: ActionCardProps) => {
-  console.log(actions);
   return (
     <Card>
       <CardHeader>
