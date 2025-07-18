@@ -9,7 +9,6 @@ import {
 import {
   Sheet,
   SheetContent,
-  SheetDescription,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
@@ -18,7 +17,7 @@ import Link from "next/link";
 
 const Navbar = () => {
   return (
-    <nav className="shadow-lg w-full">
+    <nav className="w-full shadow">
       <div className="p-4 flex justify-between max-w-[80rem] mx-auto">
         <div className="flex justify-center items-center gap-2 ">
           <Wallet />
