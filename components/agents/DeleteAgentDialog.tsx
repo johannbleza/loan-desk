@@ -12,13 +12,21 @@ import { DialogClose } from "@radix-ui/react-dialog";
 import { useState } from "react";
 import { deleteAgent } from "@/lib/actions/agents";
 import { toast } from "sonner";
+import { Trash } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 interface DeleteAgentDialogProps {
   agent: Agent;
   onDelete: () => void;
+  isButton?: boolean;
 }
 
-const DeleteAgentDialog = ({ agent, onDelete }: DeleteAgentDialogProps) => {
+const DeleteAgentDialog = ({
+  agent,
+  onDelete,
+  isButton,
+}: DeleteAgentDialogProps) => {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const handleDelete = async () => {
     try {
@@ -29,6 +37,7 @@ const DeleteAgentDialog = ({ agent, onDelete }: DeleteAgentDialogProps) => {
           position: "top-center",
         });
         onDelete();
+        if (isButton) router.push("/agents");
         return;
       }
       toast.error("Error deleting agent!", { position: "top-center" });
@@ -39,7 +48,16 @@ const DeleteAgentDialog = ({ agent, onDelete }: DeleteAgentDialogProps) => {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger className="cursor-pointer">Delete</DialogTrigger>
+      {isButton ? (
+        <DialogTrigger className="cursor-pointer" asChild>
+          <Button variant="secondary">
+            <Trash />
+            <span>Delete</span>
+          </Button>
+        </DialogTrigger>
+      ) : (
+        <DialogTrigger className="cursor-pointer">Delete</DialogTrigger>
+      )}
       <DialogContent className="w-100">
         <DialogHeader>
           <DialogTitle className="text-2xl text-start">

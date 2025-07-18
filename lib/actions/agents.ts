@@ -21,6 +21,15 @@ export const getAgents = async () => {
   if (data) return data;
 };
 
+export const getAgent = async (agent_id: string) => {
+  const { data, error } = await supabase
+    .from("agent")
+    .select()
+    .eq("id", agent_id);
+  if (error) console.log(error);
+  if (data) return data[0];
+};
+
 export const editAgent = async (agent: Agent) => {
   const { data, error } = await supabase
     .from("agent")

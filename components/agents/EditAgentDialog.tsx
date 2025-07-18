@@ -24,6 +24,7 @@ import { editAgent } from "@/lib/actions/agents";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Agent } from "@/lib/types/agent";
+import { Edit } from "lucide-react";
 
 const formSchema = z.object({
   name: z.string().min(2, {
@@ -36,9 +37,10 @@ const formSchema = z.object({
 interface EditAgentDialogProps {
   agent: Agent;
   onEdit: () => void;
+  isButton?: boolean;
 }
 
-const EditAgentDialog = ({ agent, onEdit: onAdd }: EditAgentDialogProps) => {
+const EditAgentDialog = ({ agent, onEdit, isButton }: EditAgentDialogProps) => {
   const [open, setOpen] = useState(false);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -58,7 +60,7 @@ const EditAgentDialog = ({ agent, onEdit: onAdd }: EditAgentDialogProps) => {
           position: "top-center",
         });
         form.reset();
-        onAdd();
+        onEdit();
         return;
       }
       toast.error("Error updating agent!", { position: "top-center" });
@@ -68,7 +70,16 @@ const EditAgentDialog = ({ agent, onEdit: onAdd }: EditAgentDialogProps) => {
   };
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger className="cursor-pointer">Edit</DialogTrigger>
+      {isButton ? (
+        <DialogTrigger className="cursor-pointer" asChild>
+          <Button variant="outline">
+            <Edit />
+            <span>Edit</span>
+          </Button>
+        </DialogTrigger>
+      ) : (
+        <DialogTrigger className="cursor-pointer">Edit</DialogTrigger>
+      )}
       <DialogContent>
         <DialogHeader>
           <DialogTitle className="text-2xl">Edit Agent</DialogTitle>
