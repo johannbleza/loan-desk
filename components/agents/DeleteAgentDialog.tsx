@@ -42,8 +42,10 @@ const DeleteAgentDialog = ({ agent, onDelete }: DeleteAgentDialogProps) => {
       <DialogTrigger className="cursor-pointer">Delete</DialogTrigger>
       <DialogContent className="w-100">
         <DialogHeader>
-          <DialogTitle className="text-2xl">Delete Agent?</DialogTitle>
-          <DialogDescription>
+          <DialogTitle className="text-2xl text-start">
+            Delete Agent?
+          </DialogTitle>
+          <DialogDescription className="text-start">
             Are you sure you want to delete{" "}
             <span className="font-bold text-black">{agent.name}</span>? This
             action cannot be undone and will permanently remove all associated
@@ -51,7 +53,7 @@ const DeleteAgentDialog = ({ agent, onDelete }: DeleteAgentDialogProps) => {
           </DialogDescription>
           <div className="flex gap-3">
             <Button className="cursor-pointer" onClick={handleDelete}>
-              Delete
+              Confirm Delete
             </Button>
             <DialogClose asChild>
               <Button variant="outline" className="cursor-pointer">
