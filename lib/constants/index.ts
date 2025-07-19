@@ -36,6 +36,20 @@ export const dashboardActions = [
     ],
   },
   {
+    name: "Loan Management",
+    desc: "Create and manage loans",
+    actions: [
+      {
+        action: "View All Loans",
+        link: "/loans",
+      },
+      {
+        action: "Create New Loan",
+        link: "/loans/new",
+      },
+    ],
+  },
+  {
     name: "Balance Sheet",
     desc: "View balance sheet and transaction history",
     actions: [
