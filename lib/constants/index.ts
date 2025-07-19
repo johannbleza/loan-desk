@@ -1,4 +1,10 @@
-import { ChartColumn, FileText, UserCheck, Users } from "lucide-react";
+import {
+  ChartColumn,
+  FileText,
+  HandCoins,
+  UserCheck,
+  Users,
+} from "lucide-react";
 
 export const dashboardActions = [
   {
@@ -56,6 +62,11 @@ export const navLinks = [
     icon: Users,
     name: "Clients",
     href: "/clients",
+  },
+  {
+    icon: HandCoins,
+    name: "Loans",
+    href: "/loans",
   },
   {
     icon: FileText,

@@ -123,7 +123,7 @@ const EditClientDialog = ({
                   <FormLabel>Assigned Agent *</FormLabel>
                   <Select
                     onValueChange={field.onChange}
-                    value={client.agent_id}
+                    defaultValue={client.agent_id}
                   >
                     <FormControl>
                       <SelectTrigger className="w-full">

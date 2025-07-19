@@ -14,14 +14,15 @@ import ClientActionsDropdown from "./ClientActionsDropdown";
 interface AgentListProps {
   clients: Client[];
   onAction: () => void;
+  showAll?: boolean;
 }
 
-const ClientList = ({ clients, onAction }: AgentListProps) => {
+const ClientList = ({ clients, onAction, showAll }: AgentListProps) => {
   return (
     <Card>
       <CardHeader>
         <h1 className="text-2xl font-semibold">
-          Agent Clients ({clients.length})
+          {showAll ? "All" : "Agent"} Clients ({clients.length})
         </h1>
       </CardHeader>
       <CardContent>
@@ -32,6 +33,7 @@ const ClientList = ({ clients, onAction }: AgentListProps) => {
               <TableHead>Name</TableHead>
               <TableHead>Email</TableHead>
               <TableHead>Phone</TableHead>
+              {showAll && <TableHead>Assigned Agent</TableHead>}
               <TableHead className="text-center">Loans</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
@@ -50,6 +52,16 @@ const ClientList = ({ clients, onAction }: AgentListProps) => {
                 </TableCell>
                 <TableCell>{client.email}</TableCell>
                 <TableCell>{client.phone}</TableCell>
+                {showAll && (
+                  <TableCell>
+                    <Link
+                      href={`/agents/${client.agent_id}`}
+                      className="hover:underline"
+                    >
+                      {client.agent?.name}
+                    </Link>
+                  </TableCell>
+                )}
                 <TableCell className="text-center">0</TableCell>
                 <TableCell className="flex items-center justify-end text-right">
                   <ClientActionsDropdown client={client} onAction={onAction} />

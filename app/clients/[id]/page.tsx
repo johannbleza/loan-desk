@@ -50,7 +50,6 @@ const ClientPage = () => {
   }, [id]);
 
   if (client) {
-    console.log(client);
     return (
       <main className="min-h-dvh max-w-[80rem] mx-auto p-6 flex flex-col gap-6">
         <div className="flex flex-col sm:flex-row justify-between gap-4 sm:items-end">

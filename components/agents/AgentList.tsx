@@ -17,7 +17,6 @@ interface AgentListProps {
 }
 
 const AgentList = ({ agents, onAction }: AgentListProps) => {
-  console.log(agents);
   return (
     <Card>
       <CardHeader>

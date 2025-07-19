@@ -13,11 +13,21 @@ export const addClient = async (formData: Client) => {
 };
 
 export const getClients = async (agent_id?: string) => {
+  if (agent_id) {
+    const { data, error } = await supabase
+      .from("client")
+      .select(`*, agent(name)`)
+      .eq("agent_id", agent_id)
+      .order("created_at", { ascending: true });
+
+    if (error) console.log(error);
+    if (data) return data;
+  }
   const { data, error } = await supabase
     .from("client")
-    .select()
-    .eq("agent_id", agent_id)
+    .select(`*, agent(name)`)
     .order("created_at", { ascending: true });
+
   if (error) console.log(error);
   if (data) return data;
 };
