@@ -7,9 +7,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import AgentActionsDropdown from "../agents/AgentActionsDropdown";
 import Link from "next/link";
 import { Client } from "@/lib/types/client";
+import ClientActionsDropdown from "./ClientActionsDropdown";
 
 interface AgentListProps {
   clients: Client[];
@@ -17,7 +17,6 @@ interface AgentListProps {
 }
 
 const ClientList = ({ clients, onAction }: AgentListProps) => {
-  console.log(clients);
   return (
     <Card>
       <CardHeader>
@@ -53,7 +52,7 @@ const ClientList = ({ clients, onAction }: AgentListProps) => {
                 <TableCell>{client.phone}</TableCell>
                 <TableCell className="text-center">0</TableCell>
                 <TableCell className="flex items-center justify-end text-right">
-                  <AgentActionsDropdown agent={client} onAction={onAction} />
+                  <ClientActionsDropdown client={client} onAction={onAction} />
                 </TableCell>
               </TableRow>
             ))}

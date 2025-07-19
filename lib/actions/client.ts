@@ -1,7 +1,6 @@
 "use server";
 
 import { supabase } from "@/utils/supabase";
-import { Agent } from "../types/agent";
 import { Client } from "../types/client";
 
 export const addClient = async (formData: Client) => {
@@ -32,21 +31,21 @@ export const getAgent = async (agent_id: string) => {
   if (data) return data[0];
 };
 
-export const editAgent = async (agent: Agent) => {
+export const editClient = async (client: Client) => {
   const { data, error } = await supabase
-    .from("agent")
-    .update(agent)
-    .eq("id", agent.id)
+    .from("client")
+    .update(client)
+    .eq("id", client.id)
     .select();
   if (error) console.log(error);
   if (data) return data;
 };
 
-export const deleteAgent = async (agent: Agent) => {
+export const deleteClient = async (client: Client) => {
   const { data, error } = await supabase
-    .from("agent")
+    .from("client")
     .delete()
-    .eq("id", agent.id)
+    .eq("id", client.id)
     .select();
   if (error) console.log(error);
   if (data) return data;
