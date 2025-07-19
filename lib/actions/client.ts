@@ -13,10 +13,11 @@ export const addClient = async (formData: Client) => {
   if (data) return data;
 };
 
-export const getAgents = async () => {
+export const getClients = async (agent_id?: string) => {
   const { data, error } = await supabase
-    .from("agent")
+    .from("client")
     .select()
+    .eq("agent_id", agent_id)
     .order("created_at", { ascending: true });
   if (error) console.log(error);
   if (data) return data;

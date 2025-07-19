@@ -16,12 +16,24 @@ import { useEffect, useState } from "react";
 import AddClientDialog from "@/components/clients/AddClientDialog";
 import { Card, CardContent } from "@/components/ui/card";
 import { LucideMail, Phone, UserCheck } from "lucide-react";
+import ClientList from "@/components/clients/ClientList";
+import { getClients } from "@/lib/actions/client";
+import { Client } from "@/lib/types/client";
 
 const AgentPage = () => {
   const params = useParams();
   const { id } = params;
 
   const [agent, setAgent] = useState<Agent | null>(null);
+  const [clients, setClients] = useState<Client[]>([]);
+
+  const fetchClients = async () => {
+    try {
+      setClients((await getClients(id as string)) ?? []);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const fetchAgent = async () => {
     try {
@@ -33,6 +45,7 @@ const AgentPage = () => {
 
   useEffect(() => {
     fetchAgent();
+    fetchClients();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
@@ -59,7 +72,7 @@ const AgentPage = () => {
             <h1 className="text-4xl font-bold">{agent.name}</h1>
           </div>
           <div className="flex gap-3">
-            <AddClientDialog onAdd={fetchAgent} agent_id={agent.id} />
+            <AddClientDialog onAdd={fetchClients} agent_id={agent.id} />
             <EditAgentDialog
               agent={agent}
               onEdit={fetchAgent}
@@ -96,6 +109,7 @@ const AgentPage = () => {
             </div>
           </CardContent>
         </Card>
+        <ClientList clients={clients} onAction={fetchClients} />
       </main>
     );
   } else if (agent!) {
