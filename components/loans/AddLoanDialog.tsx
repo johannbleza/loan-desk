@@ -20,7 +20,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "../ui/button";
-import { ChevronDownIcon, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import { DialogClose } from "@radix-ui/react-dialog";
 import { getAgents } from "@/lib/actions/agents";
 import { useEffect, useState } from "react";
@@ -36,12 +36,7 @@ import { getClients } from "@/lib/actions/client";
 import { Client } from "@/lib/types/client";
 import { createLoan } from "@/lib/actions/loan";
 import { toast } from "sonner";
-import { Calendar } from "@/components/ui/calendar";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import LoanDatePicker from "./LoanDatePicker";
 
 const formSchema = z.object({
   agent_id: z.string().min(1, {
@@ -72,7 +67,6 @@ interface AddLoanDialogProps {
 }
 
 const AddLoanDialog = ({ onAdd, client_id, agent_id }: AddLoanDialogProps) => {
-  const [openDate, setOpenDate] = useState(false);
   const [agents, setAgents] = useState<Agent[]>([]);
   const [clients, setClients] = useState<Client[]>([]);
   const [selectedAgentId, setSelectedAgentId] = useState<string | undefined>();
@@ -282,37 +276,10 @@ const AddLoanDialog = ({ onAdd, client_id, agent_id }: AddLoanDialogProps) => {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Loan Date</FormLabel>
-                    <Popover open={openDate} onOpenChange={setOpenDate}>
-                      <PopoverTrigger asChild>
-                        <Button
-                          variant="outline"
-                          id="date"
-                          className="justify-between font-normal"
-                        >
-                          {field.value
-                            ? new Date(field.value).toLocaleDateString()
-                            : "Select date"}
-                          <ChevronDownIcon />
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent
-                        className="w-auto overflow-hidden p-0"
-                        align="start"
-                      >
-                        <Calendar
-                          mode="single"
-                          selected={
-                            field.value ? new Date(field.value) : undefined
-                          }
-                          captionLayout="dropdown"
-                          onSelect={(date) => {
-                            field.onChange(
-                              date ? date.toLocaleDateString() : "",
-                            );
-                          }}
-                        />
-                      </PopoverContent>
-                    </Popover>
+                    <LoanDatePicker
+                      onChange={field.onChange}
+                      value={field.value}
+                    />
                     <FormMessage />
                   </FormItem>
                 )}

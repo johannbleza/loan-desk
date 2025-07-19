@@ -15,10 +15,10 @@ interface LoanDatePickerProps {
 }
 
 const LoanDatePicker = ({ value, onChange }: LoanDatePickerProps) => {
-  const [openDate, setOpenDate] = useState(false);
+  const [open, setOpen] = useState(false);
 
   return (
-    <Popover open={openDate} onOpenChange={setOpenDate}>
+    <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
           variant="outline"
@@ -36,6 +36,7 @@ const LoanDatePicker = ({ value, onChange }: LoanDatePickerProps) => {
           captionLayout="dropdown"
           onSelect={(date) => {
             onChange(date ? date.toLocaleDateString() : "");
+            setOpen(false);
           }}
         />
       </PopoverContent>
