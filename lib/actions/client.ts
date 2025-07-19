@@ -22,11 +22,11 @@ export const getClients = async (agent_id?: string) => {
   if (data) return data;
 };
 
-export const getAgent = async (agent_id: string) => {
+export const getClient = async (client_id: string) => {
   const { data, error } = await supabase
-    .from("agent")
-    .select()
-    .eq("id", agent_id);
+    .from("client")
+    .select(`*, agent(name)`)
+    .eq("id", client_id);
   if (error) console.log(error);
   if (data) return data[0];
 };

@@ -3,5 +3,5 @@ export interface Agent {
   name: string;
   email?: string;
   phone?: string;
-  no_clients: Array;
+  client?: Array;
 }

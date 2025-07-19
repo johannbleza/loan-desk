@@ -18,7 +18,7 @@ export const getAgents = async () => {
     .select(
       `
       *,
-      no_clients:client(count)
+      client(count)
     `,
     )
     .order("created_at", { ascending: true });

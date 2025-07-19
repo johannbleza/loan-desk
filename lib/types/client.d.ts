@@ -4,4 +4,5 @@ export interface Client {
   email?: string;
   phone?: string;
   agent_id: string;
+  agent?: { name?: string };
 }

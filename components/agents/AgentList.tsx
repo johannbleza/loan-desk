@@ -50,7 +50,7 @@ const AgentList = ({ agents, onAction }: AgentListProps) => {
                 <TableCell>{agent.email}</TableCell>
                 <TableCell>{agent.phone}</TableCell>
                 <TableCell className="text-center">
-                  {agent.no_clients[0].count}
+                  {agent.client[0].count}
                 </TableCell>
                 <TableCell className="flex items-center justify-end text-right">
                   <AgentActionsDropdown agent={agent} onAction={onAction} />

@@ -92,14 +92,14 @@ const AgentPage = () => {
               <h1 className="text-2xl font-semibold">Agent Information</h1>
             </div>
             <div className="grid sm:grid-cols-3 gap-2">
-              <div className="flex gap-4 items-center text-zinc-400">
+              <div className="flex gap-4 items-center text-zinc-500">
                 <LucideMail />
                 <div>
                   <h2>Email</h2>
                   <h2 className="text-black">{agent.email}</h2>
                 </div>
               </div>
-              <div className="flex gap-4 items-center text-zinc-400">
+              <div className="flex gap-4 items-center text-zinc-500">
                 <Phone />
                 <div>
                   <h2>Phone</h2>

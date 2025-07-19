@@ -1,5 +1,136 @@
-const page = () => {
-  return <div></div>;
+"use client";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
+import DeleteAgentDialog from "@/components/agents/DeleteAgentDialog";
+import EditAgentDialog from "@/components/agents/EditAgentDialog";
+import { useParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import AddClientDialog from "@/components/clients/AddClientDialog";
+import { Card, CardContent } from "@/components/ui/card";
+import { LucideMail, Phone, User, UserCheck } from "lucide-react";
+import ClientList from "@/components/clients/ClientList";
+import { getClient, getClients } from "@/lib/actions/client";
+import { Client } from "@/lib/types/client";
+import Link from "next/link";
+
+const ClientPage = () => {
+  const params = useParams();
+  const { id } = params;
+
+  const [client, setClient] = useState<Client | null>(null);
+  const [clients, setClients] = useState<Client[]>([]);
+
+  const fetchClients = async () => {
+    try {
+      setClients((await getClients(id as string)) ?? []);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const fetchClient = async () => {
+    try {
+      setClient(await getClient(id as string));
+    } catch (error) {
+      console.log(error);
+    } finally {
+    }
+  };
+
+  useEffect(() => {
+    fetchClient();
+    fetchClients();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id]);
+
+  if (client) {
+    console.log(client);
+    return (
+      <main className="min-h-dvh max-w-[80rem] mx-auto p-6 flex flex-col gap-6">
+        <div className="flex flex-col sm:flex-row justify-between gap-4 sm:items-end">
+          <div className="flex flex-col gap-4">
+            <Breadcrumb>
+              <BreadcrumbList>
+                <BreadcrumbItem>
+                  <BreadcrumbLink href="/">Home</BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                  <BreadcrumbLink href="/clients">Clients</BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                  <BreadcrumbPage>Client Profile</BreadcrumbPage>
+                </BreadcrumbItem>
+              </BreadcrumbList>
+            </Breadcrumb>
+            <h1 className="text-4xl font-bold">{client.name}</h1>
+          </div>
+          <div className="flex gap-3">
+            <AddClientDialog onAdd={fetchClients} agent_id={client.id} />
+            <EditAgentDialog
+              agent={client}
+              onEdit={fetchClient}
+              isButton={true}
+            />
+            <DeleteAgentDialog
+              agent={client}
+              onDelete={fetchClient}
+              isButton={true}
+            />
+          </div>
+        </div>
+        <Card>
+          <CardContent className="flex flex-col gap-4">
+            <div className="flex gap-2 items-center">
+              <User />
+              <h1 className="text-2xl font-semibold">Client Information</h1>
+            </div>
+            <div className="grid sm:grid-cols-3 gap-4">
+              <div className="flex gap-4 items-center text-zinc-500">
+                <LucideMail />
+                <div>
+                  <h2>Email</h2>
+                  <h2 className="text-black">{client.email}</h2>
+                </div>
+              </div>
+              <div className="flex gap-4 items-center text-zinc-500">
+                <Phone />
+                <div>
+                  <h2>Phone</h2>
+                  <h2 className="text-black">{client.phone}</h2>
+                </div>
+              </div>
+              <div className="flex gap-4 items-center text-zinc-500">
+                <UserCheck />
+                <div>
+                  <h2>Assigned Agent</h2>
+                  <Link href={`/agents/${client.agent_id}`}>
+                    <h2 className="text-black hover:underline">
+                      {client.agent!.name}
+                    </h2>
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <ClientList clients={clients} onAction={fetchClients} />
+      </main>
+    );
+  } else if (client!) {
+    return (
+      <main className="flex justify-center items-center mt-40">
+        <h1 className="font-bold text-4xl">404 Agent Not Found</h1>
+      </main>
+    );
+  }
 };
 
-export default page;
+export default ClientPage;
