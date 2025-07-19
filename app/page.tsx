@@ -6,7 +6,7 @@ const page = () => {
     <main className="min-h-dvh max-w-[80rem] mx-auto p-6">
       <div className="flex flex-col gap-2">
         <h1 className="text-4xl font-bold">Loan Management System</h1>
-        <p className="text-slate-400">
+        <p className="text-zinc-400">
           Manage your agents, clients, and loans efficiently
         </p>
       </div>

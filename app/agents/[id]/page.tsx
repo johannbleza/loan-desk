@@ -13,6 +13,9 @@ import { getAgent } from "@/lib/actions/agents";
 import { Agent } from "@/lib/types/agent";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import AddClientDialog from "@/components/clients/AddClientDialog";
+import { Card, CardContent } from "@/components/ui/card";
+import { LucideMail, Phone, UserCheck } from "lucide-react";
 
 const AgentPage = () => {
   const params = useParams();
@@ -56,6 +59,7 @@ const AgentPage = () => {
             <h1 className="text-4xl font-bold">{agent.name}</h1>
           </div>
           <div className="flex gap-3">
+            <AddClientDialog onAdd={fetchAgent} />
             <EditAgentDialog
               agent={agent}
               onEdit={fetchAgent}
@@ -68,6 +72,30 @@ const AgentPage = () => {
             />
           </div>
         </div>
+        <Card>
+          <CardContent className="flex flex-col gap-4">
+            <div className="flex gap-2 items-center">
+              <UserCheck />
+              <h1 className="text-2xl font-semibold">Agent Information</h1>
+            </div>
+            <div className="grid sm:grid-cols-3 gap-2">
+              <div className="flex gap-4 items-center text-zinc-400">
+                <LucideMail />
+                <div>
+                  <h2>Email</h2>
+                  <h2 className="text-black">{agent.email}</h2>
+                </div>
+              </div>
+              <div className="flex gap-4 items-center text-zinc-400">
+                <Phone />
+                <div>
+                  <h2>Phone</h2>
+                  <h2 className="text-black">{agent.phone}</h2>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </main>
     );
   } else if (agent!) {

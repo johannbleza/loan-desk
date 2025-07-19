@@ -1,3 +1,5 @@
+import { ChartColumn, FileText, UserCheck, Users } from "lucide-react";
+
 export const dashboardActions = [
   {
     name: "Agent Management",
@@ -36,6 +38,29 @@ export const dashboardActions = [
         link: "/balance-sheet",
       },
     ],
+  },
+];
+
+export const navLinks = [
+  {
+    icon: ChartColumn,
+    name: "Dashboard",
+    href: "/",
+  },
+  {
+    icon: UserCheck,
+    name: "Agents",
+    href: "/agents",
+  },
+  {
+    icon: Users,
+    name: "Clients",
+    href: "/clients",
+  },
+  {
+    icon: FileText,
+    name: "Balance Sheet",
+    href: "/balanc-sheet",
   },
 ];
 

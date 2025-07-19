@@ -14,17 +14,17 @@ import { Input } from "@/components/ui/input";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "../ui/button";
+import { Plus } from "lucide-react";
 import { DialogClose } from "@radix-ui/react-dialog";
-import { editAgent } from "@/lib/actions/agents";
+import { addAgent } from "@/lib/actions/agents";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Agent } from "@/lib/types/agent";
-import { Edit } from "lucide-react";
 
 const formSchema = z.object({
   name: z.string().min(2, {
@@ -34,55 +34,50 @@ const formSchema = z.object({
   phone: z.string().optional(),
 });
 
-interface EditAgentDialogProps {
-  agent: Agent;
-  onEdit: () => void;
-  isButton?: boolean;
+interface AddClientDialogProps {
+  onAdd: () => void;
 }
 
-const EditAgentDialog = ({ agent, onEdit, isButton }: EditAgentDialogProps) => {
+const AddClientDialog = ({ onAdd }: AddClientDialogProps) => {
   const [open, setOpen] = useState(false);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    values: {
-      name: agent.name,
-      email: agent.email,
-      phone: agent.phone,
+    defaultValues: {
+      name: "",
+      email: "",
+      phone: "",
     },
   });
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      const updatedAgent = await editAgent({ id: agent.id, ...values });
-      if (updatedAgent) {
+      const agent = await addAgent(values);
+      if (agent) {
         setOpen(false);
-        toast.success("Agent updated successfully!", {
-          position: "top-center",
-        });
+        toast.success("Agent added successfully!", { position: "top-center" });
         form.reset();
-        onEdit();
+        onAdd();
         return;
       }
-      toast.error("Error updating agent!", { position: "top-center" });
+      toast.error("Error adding agent!", { position: "top-center" });
     } catch (error) {
-      toast.error(`Error updating agent! ${error}`, { position: "top-center" });
+      toast.error(`Error adding agent! ${error}`, { position: "top-center" });
     }
   };
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      {isButton ? (
-        <DialogTrigger className="cursor-pointer" asChild>
-          <Button variant="outline">
-            <Edit />
-            <span>Edit</span>
-          </Button>
-        </DialogTrigger>
-      ) : (
-        <DialogTrigger className="cursor-pointer">Edit</DialogTrigger>
-      )}
+      <DialogTrigger asChild>
+        <Button className="cursor-pointer">
+          <Plus />
+          <span>Add Client</span>
+        </Button>
+      </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle className="text-2xl">Edit Agent Details</DialogTitle>
+          <DialogTitle className="text-2xl">Add New Client</DialogTitle>
+          <DialogDescription>
+            Please provide the necessary details to add a new client.
+          </DialogDescription>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
@@ -135,7 +130,7 @@ const EditAgentDialog = ({ agent, onEdit, isButton }: EditAgentDialogProps) => {
             />
             <div className="flex gap-3">
               <Button type="submit" className="cursor-pointer">
-                Save Changes
+                Add Agent
               </Button>
               <DialogClose asChild>
                 <Button variant="outline" className="cursor-pointer">
@@ -150,4 +145,4 @@ const EditAgentDialog = ({ agent, onEdit, isButton }: EditAgentDialogProps) => {
   );
 };
 
-export default EditAgentDialog;
+export default AddClientDialog;
