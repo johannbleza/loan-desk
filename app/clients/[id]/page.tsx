@@ -9,7 +9,6 @@ import {
 } from "@/components/ui/breadcrumb";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import AddClientDialog from "@/components/clients/AddClientDialog";
 import { Card, CardContent } from "@/components/ui/card";
 import { LucideMail, Phone, User, UserCheck } from "lucide-react";
 import ClientList from "@/components/clients/ClientList";
@@ -18,6 +17,7 @@ import { Client } from "@/lib/types/client";
 import Link from "next/link";
 import EditClientDialog from "@/components/clients/EditClientDialog";
 import DeleteClientDialog from "@/components/clients/DeleteClientDialog";
+import AddLoanDialog from "@/components/loans/AddLoanDialog";
 
 const ClientPage = () => {
   const params = useParams();
@@ -39,7 +39,6 @@ const ClientPage = () => {
       setClient(await getClient(id as string));
     } catch (error) {
       console.log(error);
-    } finally {
     }
   };
 
@@ -71,8 +70,12 @@ const ClientPage = () => {
             </Breadcrumb>
             <h1 className="text-4xl font-bold">{client.name}</h1>
           </div>
-          <div className="flex gap-3">
-            <AddClientDialog onAdd={fetchClients} agent_id={client.id} />
+          <div className="flex flex-wrap gap-3">
+            <AddLoanDialog
+              onAdd={fetchClients}
+              agent_id={client.agent_id}
+              client_id={client.id}
+            />
             <EditClientDialog
               client={client}
               onEdit={fetchClient}

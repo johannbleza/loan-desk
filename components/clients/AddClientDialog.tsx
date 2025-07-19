@@ -111,7 +111,10 @@ const AddClientDialog = ({ onAdd, agent_id }: AddClientDialogProps) => {
               render={({ field }) => (
                 <FormItem className="mb-5">
                   <FormLabel>Assigned Agent *</FormLabel>
-                  <Select onValueChange={field.onChange} value={agent_id}>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={agent_id}
+                  >
                     <FormControl>
                       <SelectTrigger className="w-full">
                         <SelectValue placeholder="Select an agent" />
