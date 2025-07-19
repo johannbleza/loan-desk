@@ -37,7 +37,7 @@ const DeleteAgentDialog = ({
           position: "top-center",
         });
         onDelete();
-        if (isButton) router.push("/agents");
+        if (isButton) router.back();
         return;
       }
       toast.error("Error deleting agent!", { position: "top-center" });

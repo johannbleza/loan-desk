@@ -7,8 +7,6 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import DeleteAgentDialog from "@/components/agents/DeleteAgentDialog";
-import EditAgentDialog from "@/components/agents/EditAgentDialog";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import AddClientDialog from "@/components/clients/AddClientDialog";
@@ -18,6 +16,8 @@ import ClientList from "@/components/clients/ClientList";
 import { getClient, getClients } from "@/lib/actions/client";
 import { Client } from "@/lib/types/client";
 import Link from "next/link";
+import EditClientDialog from "@/components/clients/EditClientDialog";
+import DeleteClientDialog from "@/components/clients/DeleteClientDialog";
 
 const ClientPage = () => {
   const params = useParams();
@@ -74,13 +74,13 @@ const ClientPage = () => {
           </div>
           <div className="flex gap-3">
             <AddClientDialog onAdd={fetchClients} agent_id={client.id} />
-            <EditAgentDialog
-              agent={client}
+            <EditClientDialog
+              client={client}
               onEdit={fetchClient}
               isButton={true}
             />
-            <DeleteAgentDialog
-              agent={client}
+            <DeleteClientDialog
+              client={client}
               onDelete={fetchClient}
               isButton={true}
             />
