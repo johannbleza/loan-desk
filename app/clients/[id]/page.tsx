@@ -18,6 +18,7 @@ import Link from "next/link";
 import EditClientDialog from "@/components/clients/EditClientDialog";
 import DeleteClientDialog from "@/components/clients/DeleteClientDialog";
 import AddLoanDialog from "@/components/loans/AddLoanDialog";
+import LoanList from "@/components/loans/LoanList";
 
 const ClientPage = () => {
   const params = useParams();
@@ -123,7 +124,7 @@ const ClientPage = () => {
             </div>
           </CardContent>
         </Card>
-        <ClientList clients={clients} onAction={fetchClients} />
+        <LoanList loans={[]} onAction={fetchClients} />
       </main>
     );
   } else if (client!) {

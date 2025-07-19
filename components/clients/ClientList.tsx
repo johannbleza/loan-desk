@@ -11,13 +11,13 @@ import Link from "next/link";
 import { Client } from "@/lib/types/client";
 import ClientActionsDropdown from "./ClientActionsDropdown";
 
-interface AgentListProps {
+interface ClientListProps {
   clients: Client[];
   onAction: () => void;
   showAll?: boolean;
 }
 
-const ClientList = ({ clients, onAction, showAll }: AgentListProps) => {
+const ClientList = ({ clients, onAction, showAll }: ClientListProps) => {
   return (
     <Card>
       <CardHeader>

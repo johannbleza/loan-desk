@@ -6,4 +6,5 @@ export interface Loan {
   term: number;
   interest_rate: number;
   agent_share: number;
+  loan_date: string;
 }

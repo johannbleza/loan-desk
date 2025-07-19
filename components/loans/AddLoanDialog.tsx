@@ -20,7 +20,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "../ui/button";
-import { Plus } from "lucide-react";
+import { ChevronDownIcon, Plus } from "lucide-react";
 import { DialogClose } from "@radix-ui/react-dialog";
 import { getAgents } from "@/lib/actions/agents";
 import { useEffect, useState } from "react";
@@ -36,6 +36,12 @@ import { getClients } from "@/lib/actions/client";
 import { Client } from "@/lib/types/client";
 import { createLoan } from "@/lib/actions/loan";
 import { toast } from "sonner";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 const formSchema = z.object({
   agent_id: z.string().min(1, {
@@ -56,6 +62,7 @@ const formSchema = z.object({
   agent_share: z.number().min(0, {
     message: "Agent Share is required.",
   }),
+  loan_date: z.string().min(1, { message: "Loan Date is required." }),
 });
 
 interface AddLoanDialogProps {
@@ -65,6 +72,7 @@ interface AddLoanDialogProps {
 }
 
 const AddLoanDialog = ({ onAdd, client_id, agent_id }: AddLoanDialogProps) => {
+  const [openDate, setOpenDate] = useState(false);
   const [agents, setAgents] = useState<Agent[]>([]);
   const [clients, setClients] = useState<Client[]>([]);
   const [selectedAgentId, setSelectedAgentId] = useState<string | undefined>();
@@ -94,6 +102,7 @@ const AddLoanDialog = ({ onAdd, client_id, agent_id }: AddLoanDialogProps) => {
       term: 0,
       interest_rate: 0,
       agent_share: 0,
+      loan_date: "",
     },
   });
 
@@ -141,7 +150,7 @@ const AddLoanDialog = ({ onAdd, client_id, agent_id }: AddLoanDialogProps) => {
                 name="agent_id"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Assigned Agent *</FormLabel>
+                    <FormLabel>Assigned Agent</FormLabel>
                     <Select
                       onValueChange={(value) => {
                         field.onChange(value);
@@ -171,7 +180,7 @@ const AddLoanDialog = ({ onAdd, client_id, agent_id }: AddLoanDialogProps) => {
                 name="client_id"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Client *</FormLabel>
+                    <FormLabel>Client</FormLabel>
                     <Select
                       onValueChange={field.onChange}
                       defaultValue={client_id}
@@ -194,36 +203,34 @@ const AddLoanDialog = ({ onAdd, client_id, agent_id }: AddLoanDialogProps) => {
                 )}
               />
             </div>
+            <FormField
+              control={form.control}
+              name="loan_amount"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Loan Amount</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      {...field}
+                      value={field.value === 0 ? "" : field.value}
+                      onChange={(e) => field.onChange(Number(e.target.value))}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <div className="grid grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="loan_amount"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Loan Amount *</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        placeholder="e.g., PHP 100,000.00"
-                        {...field}
-                        value={field.value === 0 ? "" : field.value}
-                        onChange={(e) => field.onChange(Number(e.target.value))}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
               <FormField
                 control={form.control}
                 name="term"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Term (Months) *</FormLabel>
+                    <FormLabel>Term (Months)</FormLabel>
                     <FormControl>
                       <Input
                         type="number"
-                        placeholder="e.g., 12"
                         {...field}
                         value={field.value === 0 ? "" : field.value}
                         onChange={(e) => field.onChange(Number(e.target.value))}
@@ -233,18 +240,15 @@ const AddLoanDialog = ({ onAdd, client_id, agent_id }: AddLoanDialogProps) => {
                   </FormItem>
                 )}
               />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
               <FormField
                 control={form.control}
                 name="interest_rate"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Interest Rate (%) *</FormLabel>
+                    <FormLabel>Interest Rate (%)</FormLabel>
                     <FormControl>
                       <Input
                         type="number"
-                        placeholder="e.g., 10%"
                         {...field}
                         value={field.value === 0 ? "" : field.value}
                         onChange={(e) => field.onChange(Number(e.target.value))}
@@ -259,11 +263,10 @@ const AddLoanDialog = ({ onAdd, client_id, agent_id }: AddLoanDialogProps) => {
                 name="agent_share"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Agent Share (%) *</FormLabel>
+                    <FormLabel>Agent Share (%)</FormLabel>
                     <FormControl>
                       <Input
                         type="number"
-                        placeholder="e.g., 20%"
                         {...field}
                         value={field.value === 0 ? "" : field.value}
                         onChange={(e) => field.onChange(Number(e.target.value))}
@@ -273,10 +276,51 @@ const AddLoanDialog = ({ onAdd, client_id, agent_id }: AddLoanDialogProps) => {
                   </FormItem>
                 )}
               />
+              <FormField
+                control={form.control}
+                name="loan_date"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Loan Date</FormLabel>
+                    <Popover open={openDate} onOpenChange={setOpenDate}>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          id="date"
+                          className="justify-between font-normal"
+                        >
+                          {field.value
+                            ? new Date(field.value).toLocaleDateString()
+                            : "Select date"}
+                          <ChevronDownIcon />
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent
+                        className="w-auto overflow-hidden p-0"
+                        align="start"
+                      >
+                        <Calendar
+                          mode="single"
+                          selected={
+                            field.value ? new Date(field.value) : undefined
+                          }
+                          captionLayout="dropdown"
+                          onSelect={(date) => {
+                            field.onChange(
+                              date ? date.toLocaleDateString() : "",
+                            );
+                          }}
+                        />
+                      </PopoverContent>
+                    </Popover>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </div>
             <div className="flex gap-3">
               <Button type="submit" className="cursor-pointer">
-                Add Client
+                Create Loan
               </Button>
               <DialogClose asChild>
                 <Button variant="outline" className="cursor-pointer">
