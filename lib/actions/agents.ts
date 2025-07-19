@@ -15,9 +15,16 @@ export const addAgent = async (formData: Agent) => {
 export const getAgents = async () => {
   const { data, error } = await supabase
     .from("agent")
-    .select()
+    .select(
+      `
+      *,
+      no_clients:client(count)
+    `,
+    )
     .order("created_at", { ascending: true });
+
   if (error) console.log(error);
+
   if (data) return data;
 };
 
