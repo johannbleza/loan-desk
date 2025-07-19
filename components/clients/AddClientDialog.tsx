@@ -22,11 +22,23 @@ import {
 import { Button } from "../ui/button";
 import { Plus } from "lucide-react";
 import { DialogClose } from "@radix-ui/react-dialog";
-import { addAgent } from "@/lib/actions/agents";
-import { useState } from "react";
+import { getAgents } from "@/lib/actions/agents";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Agent } from "@/lib/types/agent";
+import { addClient } from "@/lib/actions/client";
 
 const formSchema = z.object({
+  agent_id: z.string().min(1, {
+    message: "Agent is required.",
+  }),
   name: z.string().min(2, {
     message: "Name must be at least 2 characters.",
   }),
@@ -36,13 +48,25 @@ const formSchema = z.object({
 
 interface AddClientDialogProps {
   onAdd: () => void;
+  agent_id?: string;
 }
 
-const AddClientDialog = ({ onAdd }: AddClientDialogProps) => {
+const AddClientDialog = ({ onAdd, agent_id }: AddClientDialogProps) => {
+  const [agents, setAgents] = useState<Agent[]>([]);
+
+  const fetchAgents = async () => {
+    setAgents((await getAgents()) ?? []);
+  };
+
+  useEffect(() => {
+    fetchAgents();
+  }, []);
+
   const [open, setOpen] = useState(false);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
+    values: {
+      agent_id: agent_id ?? "",
       name: "",
       email: "",
       phone: "",
@@ -50,30 +74,31 @@ const AddClientDialog = ({ onAdd }: AddClientDialogProps) => {
   });
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    console.log(values);
     try {
-      const agent = await addAgent(values);
+      const agent = await addClient(values);
       if (agent) {
         setOpen(false);
-        toast.success("Agent added successfully!", { position: "top-center" });
+        toast.success("Client added successfully!", { position: "top-center" });
         form.reset();
         onAdd();
         return;
       }
-      toast.error("Error adding agent!", { position: "top-center" });
+      toast.error("Error adding client!", { position: "top-center" });
     } catch (error) {
-      toast.error(`Error adding agent! ${error}`, { position: "top-center" });
+      toast.error(`Error adding client! ${error}`, { position: "top-center" });
     }
   };
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="cursor-pointer">
+        <Button className="cursor-pointer" onClick={() => form.reset()}>
           <Plus />
           <span>Add Client</span>
         </Button>
       </DialogTrigger>
       <DialogContent>
-        <DialogHeader>
+        <DialogHeader className="text-start">
           <DialogTitle className="text-2xl">Add New Client</DialogTitle>
           <DialogDescription>
             Please provide the necessary details to add a new client.
@@ -81,6 +106,30 @@ const AddClientDialog = ({ onAdd }: AddClientDialogProps) => {
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+            <FormField
+              control={form.control}
+              name="agent_id"
+              render={({ field }) => (
+                <FormItem className="mb-5">
+                  <FormLabel>Assigned Agent *</FormLabel>
+                  <Select onValueChange={field.onChange} value={agent_id}>
+                    <FormControl>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select an agent" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {agents.map(({ id, name }) => (
+                        <SelectItem key={id} value={id!}>
+                          {name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <FormField
               control={form.control}
               name="name"
@@ -130,7 +179,7 @@ const AddClientDialog = ({ onAdd }: AddClientDialogProps) => {
             />
             <div className="flex gap-3">
               <Button type="submit" className="cursor-pointer">
-                Add Agent
+                Add Client
               </Button>
               <DialogClose asChild>
                 <Button variant="outline" className="cursor-pointer">

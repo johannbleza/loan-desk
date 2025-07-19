@@ -59,7 +59,7 @@ const AgentPage = () => {
             <h1 className="text-4xl font-bold">{agent.name}</h1>
           </div>
           <div className="flex gap-3">
-            <AddClientDialog onAdd={fetchAgent} />
+            <AddClientDialog onAdd={fetchAgent} agent_id={agent.id} />
             <EditAgentDialog
               agent={agent}
               onEdit={fetchAgent}
