@@ -86,7 +86,6 @@ const EditClientDialog = ({
         toast.success("Client updated successfully!", {
           position: "top-center",
         });
-        form.reset();
         onEdit();
         return;
       }
@@ -101,7 +100,7 @@ const EditClientDialog = ({
     <Dialog open={open} onOpenChange={setOpen}>
       {isButton ? (
         <DialogTrigger className="cursor-pointer" asChild>
-          <Button variant="outline">
+          <Button variant="outline" onClick={() => form.reset()}>
             <Edit />
             <span>Edit</span>
           </Button>

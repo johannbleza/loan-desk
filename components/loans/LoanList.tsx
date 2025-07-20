@@ -10,6 +10,7 @@ import {
 import Link from "next/link";
 import { Loan } from "@/lib/types/loan";
 import LoanActionsDropdown from "./LoanActionsDropdown";
+import { format } from "date-fns";
 
 interface LoanListProps {
   loans: Loan[];
@@ -74,7 +75,7 @@ const LoanList = ({
                 <TableCell className="text-center">
                   {loan.interest_rate}%
                 </TableCell>
-                <TableCell>{loan.loan_date}</TableCell>
+                <TableCell>{format(loan.loan_date, "MMM dd, yyyy")}</TableCell>
                 {(showAll || showAgent) && (
                   <TableCell>
                     <Link

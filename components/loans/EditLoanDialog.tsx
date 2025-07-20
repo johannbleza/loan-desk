@@ -69,7 +69,6 @@ const EditLoanDialog = ({ onEdit, loan, isButton }: EditLoanDialogProps) => {
       if (data) {
         setOpen(false);
         toast.success("Loan updated successfully!", { position: "top-center" });
-        form.reset();
         onEdit();
         return;
       }
@@ -83,7 +82,7 @@ const EditLoanDialog = ({ onEdit, loan, isButton }: EditLoanDialogProps) => {
       <DialogTrigger asChild>
         {isButton ? (
           <DialogTrigger className="cursor-pointer" asChild>
-            <Button variant="outline">
+            <Button variant="outline" onClick={() => form.reset()}>
               <Edit />
               <span>Edit</span>
             </Button>

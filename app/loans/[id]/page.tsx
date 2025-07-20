@@ -26,6 +26,7 @@ import { Loan } from "@/lib/types/loan";
 import { getLoan, getLoans } from "@/lib/actions/loan";
 import EditLoanDialog from "@/components/loans/EditLoanDialog";
 import DeleteLoanDialog from "@/components/loans/DeleteLoanDialog";
+import { format } from "date-fns";
 
 const ClientPage = () => {
   const params = useParams();
@@ -77,7 +78,7 @@ const ClientPage = () => {
               </BreadcrumbList>
             </Breadcrumb>
             <h1 className="text-4xl font-bold">
-              L-{loan.id?.slice(-4).toUpperCase()}
+              Loan ID: L-{loan.id?.slice(-4).toUpperCase()}
             </h1>
           </div>
           <div className="flex flex-wrap gap-3">
@@ -111,7 +112,9 @@ const ClientPage = () => {
                 <Calendar1 />
                 <div>
                   <h2>Loan Start Date</h2>
-                  <h2 className="text-black font-semibold">{loan.loan_date}</h2>
+                  <h2 className="text-black font-semibold">
+                    {format(loan.loan_date, "MMM dd, yyyy")}
+                  </h2>
                 </div>
               </div>
               <div className="flex gap-4 items-center text-zinc-500">
