@@ -36,11 +36,11 @@ export const getLoans = async (client_id?: string, agent_id?: string) => {
   }
 };
 
-export const getClient = async (client_id: string) => {
+export const getLoan = async (loan_id: string) => {
   const { data, error } = await supabase
-    .from("client")
-    .select(`*, agent(name)`)
-    .eq("id", client_id);
+    .from("loan")
+    .select(`*, agent(name), client(name)`)
+    .eq("id", loan_id);
   if (error) console.log(error);
   if (data) return data[0];
 };

@@ -56,7 +56,7 @@ const LoanList = ({
                 <TableCell className="w-4">{index + 1}</TableCell>
                 <TableCell>
                   <Link href={`/loans/${loan.id}`} className="hover:underline">
-                    loan-{loan.id?.slice(-4)}
+                    L-{loan.id?.slice(-4).toUpperCase()}
                   </Link>
                 </TableCell>
                 {(showAll || showClient) && (

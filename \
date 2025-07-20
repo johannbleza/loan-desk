@@ -11,16 +11,23 @@ import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import {
-  BadgePercent,
+  Calendar,
   Calendar1,
   CalendarDays,
+  CalendarRange,
   HandCoins,
+  LucideMail,
   Percent,
   PhilippinePeso,
+  Phone,
   User,
   UserCheck,
 } from "lucide-react";
+import { getClient } from "@/lib/actions/client";
 import Link from "next/link";
+import EditClientDialog from "@/components/clients/EditClientDialog";
+import DeleteClientDialog from "@/components/clients/DeleteClientDialog";
+import AddLoanDialog from "@/components/loans/AddLoanDialog";
 import LoanList from "@/components/loans/LoanList";
 import { Loan } from "@/lib/types/loan";
 import { getLoan, getLoans } from "@/lib/actions/loan";
@@ -95,16 +102,14 @@ const ClientPage = () => {
               <HandCoins />
               <h1 className="text-2xl font-semibold">Loan Details</h1>
             </div>
-            <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="grid md:grid-cols-4 gap-4">
               <div className="flex gap-4 items-center text-zinc-500">
                 <User />
                 <div>
                   <h2>Client</h2>
-                  <Link href={`/clients/${loan.client_id}`}>
-                    <h2 className="text-black font-semibold hover:underline">
-                      {loan.client?.name}
-                    </h2>
-                  </Link>
+                  <h2 className="text-black font-semibold">
+                    {loan.client?.name}
+                  </h2>
                 </div>
               </div>
               <div className="flex gap-4 items-center text-zinc-500">
@@ -151,7 +156,7 @@ const ClientPage = () => {
                 </div>
               </div>
               <div className="flex gap-4 items-center text-zinc-500">
-                <BadgePercent />
+                <Percent />
                 <div>
                   <h2>Agent Share</h2>
                   <h2 className="text-black font-semibold">
