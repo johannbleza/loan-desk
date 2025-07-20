@@ -8,11 +8,10 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { useEffect, useState } from "react";
-import { getClients } from "@/lib/actions/client";
-import AddClientDialog from "@/components/clients/AddClientDialog";
 import LoanList from "@/components/loans/LoanList";
 import { Loan } from "@/lib/types/loan";
 import { getLoans } from "@/lib/actions/loan";
+import AddLoanDialog from "@/components/loans/AddLoanDialog";
 
 const Page = () => {
   const [loans, setLoans] = useState<Loan[]>([]);
@@ -46,7 +45,7 @@ const Page = () => {
           </Breadcrumb>
           <h1 className="text-4xl font-bold">Loans</h1>
         </div>
-        {/* <AddClientDialog onAdd={fetchClients} /> */}
+        <AddLoanDialog onAdd={fetchLoans} />
       </div>
       <LoanList showAll={true} loans={loans} onAction={fetchLoans} />
     </main>
