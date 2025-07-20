@@ -8,8 +8,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import Link from "next/link";
-import ClientActionsDropdown from "../clients/ClientActionsDropdown";
 import { Loan } from "@/lib/types/loan";
+import LoanActionsDropdown from "./LoanActionsDropdown";
 
 interface LoanListProps {
   loans: Loan[];
@@ -54,19 +54,19 @@ const LoanList = ({ loans, onAction, showAll }: LoanListProps) => {
                     loan-{loan.id?.slice(-4)}
                   </Link>
                 </TableCell>
-                <TableCell>{loan.client.name}</TableCell>
-                <TableCell>PHP {loan.loan_amount}</TableCell>
+                <TableCell>{loan.client?.name}</TableCell>
+                <TableCell>PHP {loan.loan_amount.toLocaleString()}</TableCell>
                 <TableCell className="text-center">{loan.term}</TableCell>
                 <TableCell className="text-center">
                   {loan.interest_rate}%
                 </TableCell>
                 <TableCell>{loan.loan_date}</TableCell>
-                <TableCell>{loan.agent.name}</TableCell>
+                <TableCell>{loan.agent?.name}</TableCell>
                 <TableCell className="text-center">
                   {loan.agent_share}%
                 </TableCell>
                 <TableCell className="flex items-center justify-end text-right">
-                  {/* <ClientActionsDropdown client={client} onAction={onAction} /> */}
+                  <LoanActionsDropdown loan={loan} onAction={onAction} />
                 </TableCell>
               </TableRow>
             ))}

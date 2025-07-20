@@ -1,7 +1,6 @@
 "use server";
 
 import { supabase } from "@/utils/supabase";
-import { Client } from "../types/client";
 import { Loan } from "../types/loan";
 
 export const createLoan = async (formData: Loan) => {
@@ -39,21 +38,21 @@ export const getClient = async (client_id: string) => {
   if (data) return data[0];
 };
 
-export const editClient = async (client: Client) => {
+export const editLoan = async (loan: Loan) => {
   const { data, error } = await supabase
-    .from("client")
-    .update(client)
-    .eq("id", client.id)
+    .from("loan")
+    .update(loan)
+    .eq("id", loan.id)
     .select();
   if (error) console.log(error);
   if (data) return data;
 };
 
-export const deleteClient = async (client: Client) => {
+export const deleteLoan = async (loan: Loan) => {
   const { data, error } = await supabase
-    .from("client")
+    .from("loan")
     .delete()
-    .eq("id", client.id)
+    .eq("id", loan.id)
     .select();
   if (error) console.log(error);
   if (data) return data;

@@ -14,13 +14,12 @@ import { Input } from "@/components/ui/input";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "../ui/button";
-import { Plus } from "lucide-react";
+import { Edit } from "lucide-react";
 import { DialogClose } from "@radix-ui/react-dialog";
 import { getAgents } from "@/lib/actions/agents";
 import { useEffect, useState } from "react";
@@ -34,9 +33,10 @@ import {
 import { Agent } from "@/lib/types/agent";
 import { getClients } from "@/lib/actions/client";
 import { Client } from "@/lib/types/client";
-import { createLoan } from "@/lib/actions/loan";
+import { editLoan } from "@/lib/actions/loan";
 import { toast } from "sonner";
 import LoanDatePicker from "./LoanDatePicker";
+import { Loan } from "@/lib/types/loan";
 
 const formSchema = z.object({
   agent_id: z.string().min(1, {
@@ -60,22 +60,18 @@ const formSchema = z.object({
   loan_date: z.string().min(1, { message: "Loan Date is required." }),
 });
 
-interface AddLoanDialogProps {
-  onAdd: () => void;
-  client_id?: string;
-  agent_id?: string;
-  client_name?: string;
+interface EditLoanDialogProps {
+  onEdit: () => void;
+  loan: Loan;
+  isButton?: boolean;
 }
 
-const AddLoanDialog = ({
-  onAdd,
-  client_id,
-  agent_id,
-  client_name,
-}: AddLoanDialogProps) => {
+const EditLoanDialog = ({ onEdit, loan, isButton }: EditLoanDialogProps) => {
   const [agents, setAgents] = useState<Agent[]>([]);
   const [clients, setClients] = useState<Client[]>([]);
-  const [selectedAgentId, setSelectedAgentId] = useState<string | undefined>();
+  const [selectedAgentId, setSelectedAgentId] = useState<string | undefined>(
+    loan.agent_id,
+  );
 
   const fetchAgents = async () => {
     setAgents((await getAgents()) ?? []);
@@ -90,57 +86,55 @@ const AddLoanDialog = ({
       setClients((await getClients(selectedAgentId)) ?? []);
     };
     fetchClients();
-  }, [selectedAgentId, client_name]);
+  }, [selectedAgentId, loan.client?.name]);
 
   const [open, setOpen] = useState(false);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      agent_id: agent_id ?? "",
-      client_id: client_id ?? "",
-      loan_amount: 0,
-      term: 0,
-      interest_rate: 0,
-      agent_share: 0,
-      loan_date: "",
+      agent_id: loan.agent_id ?? "",
+      client_id: loan.client_id ?? "",
+      loan_amount: loan.loan_amount,
+      term: loan.term,
+      interest_rate: loan.interest_rate,
+      agent_share: loan.agent_share,
+      loan_date: loan.loan_date,
     },
   });
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    console.log(values);
     try {
-      const data = await createLoan(values);
+      const data = await editLoan({ id: loan.id, ...values });
       if (data) {
         setOpen(false);
-        toast.success("Loan created successfully!", { position: "top-center" });
+        toast.success("Loan updated successfully!", { position: "top-center" });
         form.reset();
-        onAdd();
+        onEdit();
         return;
       }
-      toast.error("Error creating loan!", { position: "top-center" });
+      toast.error("Error updating loan!", { position: "top-center" });
     } catch (error) {
-      toast.error(`Error creating loan! ${error}`, { position: "top-center" });
+      toast.error(`Error updating loan! ${error}`, { position: "top-center" });
     }
   };
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button
-          className="cursor-pointer"
-          onClick={() => {
-            setSelectedAgentId(agent_id ?? "");
-            form.reset();
-          }}
-        >
-          <Plus />
-          <span>Create New Loan</span>
-        </Button>
+        {isButton ? (
+          <DialogTrigger className="cursor-pointer" asChild>
+            <Button variant="outline">
+              <Edit />
+              <span>Edit</span>
+            </Button>
+          </DialogTrigger>
+        ) : (
+          <DialogTrigger className="cursor-pointer">Edit</DialogTrigger>
+        )}
       </DialogTrigger>
       <DialogContent>
         <DialogHeader className="text-start">
-          <DialogTitle className="text-2xl">Create New Loan</DialogTitle>
-          <DialogDescription>
-            Please provide the necessary details to create a new loan.
-          </DialogDescription>
+          <DialogTitle className="text-2xl">Edit Loan Details</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
@@ -156,7 +150,7 @@ const AddLoanDialog = ({
                         field.onChange(value);
                         setSelectedAgentId(value);
                       }}
-                      defaultValue={agent_id}
+                      defaultValue={loan.agent_id}
                     >
                       <FormControl>
                         <SelectTrigger className="w-full">
@@ -183,7 +177,7 @@ const AddLoanDialog = ({
                     <FormLabel>Client</FormLabel>
                     <Select
                       onValueChange={field.onChange}
-                      defaultValue={client_id}
+                      defaultValue={loan.client_id}
                     >
                       <FormControl>
                         <SelectTrigger className="w-full">
@@ -293,7 +287,7 @@ const AddLoanDialog = ({
             </div>
             <div className="flex gap-3">
               <Button type="submit" className="cursor-pointer">
-                Create Loan
+                Save Changes
               </Button>
               <DialogClose asChild>
                 <Button variant="outline" className="cursor-pointer">
@@ -308,4 +302,4 @@ const AddLoanDialog = ({
   );
 };
 
-export default AddLoanDialog;
+export default EditLoanDialog;

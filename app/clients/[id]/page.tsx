@@ -11,7 +11,7 @@ import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { LucideMail, Phone, User, UserCheck } from "lucide-react";
-import { getClient, getClients } from "@/lib/actions/client";
+import { getClient } from "@/lib/actions/client";
 import { Client } from "@/lib/types/client";
 import Link from "next/link";
 import EditClientDialog from "@/components/clients/EditClientDialog";
@@ -77,6 +77,7 @@ const ClientPage = () => {
               onAdd={fetchLoans}
               agent_id={client.agent_id}
               client_id={client.id}
+              client_name={client.name}
             />
             <EditClientDialog
               client={client}
