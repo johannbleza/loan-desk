@@ -18,6 +18,7 @@ interface LoanListProps {
 }
 
 const LoanList = ({ loans, onAction, showAll }: LoanListProps) => {
+  console.log(loans);
   return (
     <Card>
       <CardHeader>
@@ -31,42 +32,44 @@ const LoanList = ({ loans, onAction, showAll }: LoanListProps) => {
             <TableRow>
               <TableHead className="w-8"></TableHead>
               <TableHead>Loan ID</TableHead>
+              <TableHead>Client</TableHead>
               <TableHead>Loan Amount</TableHead>
-              <TableHead>Term Completed</TableHead>
+              <TableHead className="text-center">Term Completed</TableHead>
               <TableHead className="text-center">Interest Rate</TableHead>
+              <TableHead>Loan Date</TableHead>
+              <TableHead>Agent</TableHead>
+              <TableHead className="text-center">Agent Share</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {/* {loans.map((client, index) => ( */}
-            {/*   <TableRow key={client.id}> */}
-            {/*     <TableCell className="w-4">{index + 1}</TableCell> */}
-            {/*     <TableCell> */}
-            {/*       <Link */}
-            {/*         href={`/clients/${client.id}`} */}
-            {/*         className="hover:underline" */}
-            {/*       > */}
-            {/*         {client.name} */}
-            {/*       </Link> */}
-            {/*     </TableCell> */}
-            {/*     <TableCell>{client.email}</TableCell> */}
-            {/*     <TableCell>{client.phone}</TableCell> */}
-            {/*     {showAll && ( */}
-            {/*       <TableCell> */}
-            {/*         <Link */}
-            {/*           href={`/agents/${client.agent_id}`} */}
-            {/*           className="hover:underline" */}
-            {/*         > */}
-            {/*           {client.agent?.name} */}
-            {/*         </Link> */}
-            {/*       </TableCell> */}
-            {/*     )} */}
-            {/*     <TableCell className="text-center">0</TableCell> */}
-            {/*     <TableCell className="flex items-center justify-end text-right"> */}
-            {/*       <ClientActionsDropdown client={client} onAction={onAction} /> */}
-            {/*     </TableCell> */}
-            {/*   </TableRow> */}
-            {/* ))} */}
+            {loans.map((loan, index) => (
+              <TableRow key={loan.id}>
+                <TableCell className="w-4">{index + 1}</TableCell>
+                <TableCell>
+                  <Link
+                    href={`/clients/${loan.id}`}
+                    className="hover:underline"
+                  >
+                    loan-{loan.id?.slice(-4)}
+                  </Link>
+                </TableCell>
+                <TableCell>{loan.client.name}</TableCell>
+                <TableCell>PHP {loan.loan_amount}</TableCell>
+                <TableCell className="text-center">{loan.term}</TableCell>
+                <TableCell className="text-center">
+                  {loan.interest_rate}%
+                </TableCell>
+                <TableCell>{loan.loan_date}</TableCell>
+                <TableCell>{loan.agent.name}</TableCell>
+                <TableCell className="text-center">
+                  {loan.agent_share}%
+                </TableCell>
+                <TableCell className="flex items-center justify-end text-right">
+                  {/* <ClientActionsDropdown client={client} onAction={onAction} /> */}
+                </TableCell>
+              </TableRow>
+            ))}
           </TableBody>
         </Table>
       </CardContent>

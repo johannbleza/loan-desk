@@ -26,6 +26,7 @@ import { Agent } from "@/lib/types/agent";
 import { addClient } from "@/lib/actions/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
+import AddAgentDialog from "@/components/agents/AddAgentDialog";
 
 const formSchema = z.object({
   agent_id: z.string().min(1, {
@@ -104,6 +105,8 @@ const AddClientPage = () => {
                             {name}
                           </SelectItem>
                         ))}
+
+                        <AddAgentDialog onAdd={fetchAgents} />
                       </SelectContent>
                     </Select>
                     <FormMessage />

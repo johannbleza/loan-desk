@@ -7,4 +7,10 @@ export interface Loan {
   interest_rate: number;
   agent_share: number;
   loan_date: string;
+  agent: {
+    name: string;
+  };
+  client: {
+    name: string;
+  };
 }

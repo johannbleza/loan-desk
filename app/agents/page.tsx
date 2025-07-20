@@ -41,7 +41,7 @@ const Page = () => {
           </Breadcrumb>
           <h1 className="text-4xl font-bold">Agents</h1>
         </div>
-        <AddAgentDialog onAdd={fetchAgents} />
+        <AddAgentDialog onAdd={fetchAgents} isButton={true} />
       </div>
       <AgentList agents={agents} onAction={fetchAgents} />
     </main>

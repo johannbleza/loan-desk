@@ -49,9 +49,14 @@ const formSchema = z.object({
 interface AddClientDialogProps {
   onAdd: () => void;
   agent_id?: string;
+  agent_name?: string;
 }
 
-const AddClientDialog = ({ onAdd, agent_id }: AddClientDialogProps) => {
+const AddClientDialog = ({
+  onAdd,
+  agent_id,
+  agent_name,
+}: AddClientDialogProps) => {
   const [agents, setAgents] = useState<Agent[]>([]);
 
   const fetchAgents = async () => {
@@ -60,7 +65,7 @@ const AddClientDialog = ({ onAdd, agent_id }: AddClientDialogProps) => {
 
   useEffect(() => {
     fetchAgents();
-  }, []);
+  }, [agent_name]);
 
   const [open, setOpen] = useState(false);
   const form = useForm<z.infer<typeof formSchema>>({

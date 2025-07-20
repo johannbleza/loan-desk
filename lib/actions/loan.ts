@@ -10,12 +10,12 @@ export const createLoan = async (formData: Loan) => {
   if (data) return data;
 };
 
-export const getClients = async (agent_id?: string) => {
-  if (agent_id) {
+export const getLoans = async (client_id?: string) => {
+  if (client_id) {
     const { data, error } = await supabase
-      .from("client")
-      .select(`*, agent(name)`)
-      .eq("agent_id", agent_id)
+      .from("loan")
+      .select(`*, agent(name), client(name)`)
+      .eq("client_id", client_id)
       .order("created_at", { ascending: true });
 
     if (error) console.log(error);
@@ -23,7 +23,7 @@ export const getClients = async (agent_id?: string) => {
   }
   const { data, error } = await supabase
     .from("client")
-    .select(`*, agent(name)`)
+    .select(`*, agent(name), client(name)`)
     .order("created_at", { ascending: true });
 
   if (error) console.log(error);

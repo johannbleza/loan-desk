@@ -36,9 +36,10 @@ const formSchema = z.object({
 
 interface AddAgentDialogProps {
   onAdd: () => void;
+  isButton?: boolean;
 }
 
-const AddAgentDialog = ({ onAdd }: AddAgentDialogProps) => {
+const AddAgentDialog = ({ onAdd, isButton }: AddAgentDialogProps) => {
   const [open, setOpen] = useState(false);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -67,10 +68,16 @@ const AddAgentDialog = ({ onAdd }: AddAgentDialogProps) => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="cursor-pointer">
-          <Plus />
-          <span>Add Agent</span>
-        </Button>
+        {isButton ? (
+          <Button className="cursor-pointer">
+            <Plus />
+            <span>Add Agent</span>
+          </Button>
+        ) : (
+          <div className="cursor-pointer p-2 text-sm hover:bg-zinc-100 rounded-lg">
+            New Agent
+          </div>
+        )}
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>

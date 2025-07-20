@@ -11,7 +11,6 @@ import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { LucideMail, Phone, User, UserCheck } from "lucide-react";
-import ClientList from "@/components/clients/ClientList";
 import { getClient, getClients } from "@/lib/actions/client";
 import { Client } from "@/lib/types/client";
 import Link from "next/link";
@@ -19,17 +18,19 @@ import EditClientDialog from "@/components/clients/EditClientDialog";
 import DeleteClientDialog from "@/components/clients/DeleteClientDialog";
 import AddLoanDialog from "@/components/loans/AddLoanDialog";
 import LoanList from "@/components/loans/LoanList";
+import { Loan } from "@/lib/types/loan";
+import { getLoans } from "@/lib/actions/loan";
 
 const ClientPage = () => {
   const params = useParams();
   const { id } = params;
 
   const [client, setClient] = useState<Client | null>(null);
-  const [clients, setClients] = useState<Client[]>([]);
+  const [loans, setLoans] = useState<Loan[]>([]);
 
-  const fetchClients = async () => {
+  const fetchLoans = async () => {
     try {
-      setClients((await getClients(id as string)) ?? []);
+      setLoans((await getLoans(id as string)) ?? []);
     } catch (error) {
       console.log(error);
     }
@@ -45,7 +46,7 @@ const ClientPage = () => {
 
   useEffect(() => {
     fetchClient();
-    fetchClients();
+    fetchLoans();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
@@ -73,7 +74,7 @@ const ClientPage = () => {
           </div>
           <div className="flex flex-wrap gap-3">
             <AddLoanDialog
-              onAdd={fetchClients}
+              onAdd={fetchLoans}
               agent_id={client.agent_id}
               client_id={client.id}
             />
@@ -124,7 +125,7 @@ const ClientPage = () => {
             </div>
           </CardContent>
         </Card>
-        <LoanList loans={[]} onAction={fetchClients} />
+        <LoanList loans={loans} onAction={fetchLoans} />
       </main>
     );
   } else if (client!) {
