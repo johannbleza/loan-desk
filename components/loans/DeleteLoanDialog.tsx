@@ -68,7 +68,7 @@ const DeleteLoanDialog = ({
           <DialogDescription className="text-start">
             Are you sure you want to delete{" "}
             <span className="font-bold text-black">
-              loan-{loan.id?.slice(-4)}
+              L-{loan.id?.slice(-4).toUpperCase()}
             </span>
             This action cannot be undone and will permanently remove all
             associated data.

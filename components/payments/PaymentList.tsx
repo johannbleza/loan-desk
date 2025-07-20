@@ -8,11 +8,10 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import Link from "next/link";
-import LoanActionsDropdown from "../loans/LoanActionsDropdown";
 import { format, formatDate } from "date-fns";
 import { Payment } from "@/lib/types/payment";
 import { formatToPeso } from "@/lib/utils";
-import { Badge } from "../ui/badge";
+import UpdatePaymentStatusDialog from "./UpdatePaymentStatusDialog";
 
 interface PaymentListProps {
   payments: Payment[];
@@ -104,10 +103,16 @@ const PaymentList = ({
                     </Link>
                   </TableCell>
                 )}
-                <TableCell></TableCell>
-                <TableCell></TableCell>
+                <TableCell>
+                  {payment.payment_date &&
+                    format(payment.payment_date, "MMM dd, yyyy")}
+                </TableCell>
+                <TableCell>{payment.payment_mode}</TableCell>
                 <TableCell className="flex items-center justify-end text-right">
-                  <Badge variant="outline">Due</Badge>
+                  <UpdatePaymentStatusDialog
+                    onEdit={onAction}
+                    payment={payment}
+                  />
                 </TableCell>
               </TableRow>
             ))}

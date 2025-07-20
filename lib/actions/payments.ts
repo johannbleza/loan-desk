@@ -3,7 +3,7 @@
 import { supabase } from "@/utils/supabase";
 import { Loan } from "../types/loan";
 import { pmt } from "../utils";
-import { Payment } from "../types/payment";
+import { Payment, PaymentStatus } from "../types/payment";
 import { addMonths } from "date-fns";
 
 export const generatePaymentSchedule = async (loan: Loan) => {
@@ -18,7 +18,7 @@ export const generatePaymentSchedule = async (loan: Loan) => {
   let loan_amount = loan.loan_amount;
 
   for (let i = 0; i < loan.term; i++) {
-    const due_date = addMonths(loan.loan_date, i + 1).toISOString();
+    const due_date = addMonths(loan.loan_date, i + 1).toLocaleString();
     const interest_paid = loan_amount * (loan.interest_rate / 100);
     const capital_payment = monthly_payment - interest_paid;
 
@@ -85,11 +85,11 @@ export const getLoan = async (loan_id: string) => {
   if (data) return data[0];
 };
 
-export const editLoan = async (loan: Loan) => {
+export const updatePaymentStatus = async (payment: PaymentStatus) => {
   const { data, error } = await supabase
-    .from("loan")
-    .update(loan)
-    .eq("id", loan.id)
+    .from("payment")
+    .update(payment)
+    .eq("id", payment.id)
     .select();
   if (error) console.log(error);
   if (data) return data;

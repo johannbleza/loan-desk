@@ -93,3 +93,5 @@ export interface actions {
   action: string;
   link: string;
 }
+
+export const paymentStatus = ["Due", "Paid", "Interest Paid", "Capital Paid"];

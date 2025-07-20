@@ -5,6 +5,7 @@ import { z } from "zod";
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -99,7 +100,7 @@ const EditLoanDialog = ({ onEdit, loan, isButton }: EditLoanDialogProps) => {
           <DialogTitle className="text-2xl">Edit Loan Details</DialogTitle>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
               control={form.control}
               name="loan_amount"
@@ -118,7 +119,7 @@ const EditLoanDialog = ({ onEdit, loan, isButton }: EditLoanDialogProps) => {
                 </FormItem>
               )}
             />
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-4 mb-4">
               <FormField
                 control={form.control}
                 name="term"
@@ -188,6 +189,9 @@ const EditLoanDialog = ({ onEdit, loan, isButton }: EditLoanDialogProps) => {
                 )}
               />
             </div>
+            <FormDescription className="my-4 text-destructive">
+              Warning: Changes will reset the payment schedule.
+            </FormDescription>
             <div className="flex gap-3">
               <Button type="submit" className="cursor-pointer">
                 Save Changes

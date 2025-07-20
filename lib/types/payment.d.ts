@@ -16,3 +16,10 @@ export interface Payment {
   remarks?: string;
   loan?: Loan;
 }
+
+export interface PaymentStatus {
+  id: string;
+  payment_date?: string | null;
+  payment_mode?: string | null;
+  remarks: string;
+}
