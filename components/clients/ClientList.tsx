@@ -62,7 +62,9 @@ const ClientList = ({ clients, onAction, showAll }: ClientListProps) => {
                     </Link>
                   </TableCell>
                 )}
-                <TableCell className="text-center">0</TableCell>
+                <TableCell className="text-center">
+                  {client.loan[0].count}
+                </TableCell>
                 <TableCell className="flex items-center justify-end text-right">
                   <ClientActionsDropdown client={client} onAction={onAction} />
                 </TableCell>

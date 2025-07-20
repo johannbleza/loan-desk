@@ -33,16 +33,16 @@ const DeleteLoanDialog = ({
       const data = await deleteLoan(loan);
       if (data) {
         setOpen(false);
-        toast.success("Client deleted successfully!", {
+        toast.success("Loan deleted successfully!", {
           position: "top-center",
         });
         onDelete();
         if (isButton) router.back();
         return;
       }
-      toast.error("Error deleting client!", { position: "top-center" });
+      toast.error("Error deleting loan!", { position: "top-center" });
     } catch (error) {
-      toast.error(`Error deleting client! ${error}`, {
+      toast.error(`Error deleting loan! ${error}`, {
         position: "top-center",
       });
     }

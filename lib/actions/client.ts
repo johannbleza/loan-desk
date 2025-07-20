@@ -13,20 +13,14 @@ export const addClient = async (formData: Client) => {
 };
 
 export const getClients = async (agent_id?: string) => {
-  if (agent_id) {
-    const { data, error } = await supabase
-      .from("client")
-      .select(`*, agent(name)`)
-      .eq("agent_id", agent_id)
-      .order("created_at", { ascending: true });
-
-    if (error) console.log(error);
-    if (data) return data;
-  }
-  const { data, error } = await supabase
+  let query = supabase
     .from("client")
-    .select(`*, agent(name)`)
+    .select(`*, agent(name), loan(count)`)
     .order("created_at", { ascending: true });
+
+  if (agent_id) query = query.eq("agent_id", agent_id);
+
+  const { data, error } = await query;
 
   if (error) console.log(error);
   if (data) return data;

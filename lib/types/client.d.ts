@@ -5,4 +5,5 @@ export interface Client {
   phone?: string;
   agent_id: string;
   agent?: { name?: string };
+  loan?: Array;
 }

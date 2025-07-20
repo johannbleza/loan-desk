@@ -19,10 +19,23 @@ import { LucideMail, Phone, UserCheck } from "lucide-react";
 import ClientList from "@/components/clients/ClientList";
 import { getClients } from "@/lib/actions/client";
 import { Client } from "@/lib/types/client";
+import LoanList from "@/components/loans/LoanList";
+import { getLoans } from "@/lib/actions/loan";
+import { Loan } from "@/lib/types/loan";
 
 const AgentPage = () => {
   const params = useParams();
   const { id } = params;
+
+  const [loans, setLoans] = useState<Loan[]>([]);
+
+  const fetchLoans = async () => {
+    try {
+      setLoans((await getLoans("", id as string)) ?? []);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const [agent, setAgent] = useState<Agent | null>(null);
   const [clients, setClients] = useState<Client[]>([]);
@@ -46,6 +59,7 @@ const AgentPage = () => {
   useEffect(() => {
     fetchAgent();
     fetchClients();
+    fetchLoans();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
@@ -114,6 +128,7 @@ const AgentPage = () => {
           </CardContent>
         </Card>
         <ClientList clients={clients} onAction={fetchClients} />
+        <LoanList loans={loans} onAction={fetchLoans} showClient={true} />
       </main>
     );
   } else if (agent!) {

@@ -9,24 +9,31 @@ export const createLoan = async (formData: Loan) => {
   if (data) return data;
 };
 
-export const getLoans = async (client_id?: string) => {
-  if (client_id) {
-    const { data, error } = await supabase
+export const getLoans = async (client_id?: string, agent_id?: string) => {
+  try {
+    let query = supabase
       .from("loan")
       .select(`*, agent(name), client(name)`)
-      .eq("client_id", client_id)
       .order("created_at", { ascending: true });
 
-    if (error) console.log(error);
-    if (data) return data;
-  }
-  const { data, error } = await supabase
-    .from("client")
-    .select(`*, agent(name), client(name)`)
-    .order("created_at", { ascending: true });
+    if (client_id) {
+      query = query.eq("client_id", client_id);
+    } else if (agent_id) {
+      query = query.eq("agent_id", agent_id);
+    }
 
-  if (error) console.log(error);
-  if (data) return data;
+    const { data, error } = await query;
+
+    if (error) {
+      console.error("Error fetching loans:", error);
+      throw error;
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Failed to get loans:", error);
+    throw error;
+  }
 };
 
 export const getClient = async (client_id: string) => {

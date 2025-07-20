@@ -26,12 +26,12 @@ const LoanList = ({
   showAgent,
   showClient,
 }: LoanListProps) => {
-  console.log(loans);
   return (
     <Card>
       <CardHeader>
         <h1 className="text-2xl font-semibold">
-          {showAll ? "All" : "Client"} Loans ({loans.length})
+          {showAll ? "All" : showClient ? "Handled" : "Client"} Loans (
+          {loans.length})
         </h1>
       </CardHeader>
       <CardContent>
@@ -55,10 +55,7 @@ const LoanList = ({
               <TableRow key={loan.id}>
                 <TableCell className="w-4">{index + 1}</TableCell>
                 <TableCell>
-                  <Link
-                    href={`/clients/${loan.id}`}
-                    className="hover:underline"
-                  >
+                  <Link href={`/loans/${loan.id}`} className="hover:underline">
                     loan-{loan.id?.slice(-4)}
                   </Link>
                 </TableCell>
@@ -81,7 +78,7 @@ const LoanList = ({
                 {(showAll || showAgent) && (
                   <TableCell>
                     <Link
-                      href={`/agents/${loan.client_id}`}
+                      href={`/agents/${loan.agent_id}`}
                       className="hover:underline"
                     >
                       {loan.agent?.name}
