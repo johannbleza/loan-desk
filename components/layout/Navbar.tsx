@@ -1,4 +1,4 @@
-import { Menu, Wallet } from "lucide-react";
+import { Menu, WalletMinimal } from "lucide-react";
 import {
   Sheet,
   SheetClose,
@@ -18,7 +18,7 @@ const Navbar = () => {
           href="/"
           className="flex justify-center items-center gap-2 cursor-pointer"
         >
-          <Wallet />
+          <WalletMinimal />
           <h1 className="text-2xl font-bold">LoanDesk</h1>
         </Link>
         {/* Desktop View */}
