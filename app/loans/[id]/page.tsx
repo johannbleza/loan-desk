@@ -21,26 +21,29 @@ import {
   UserCheck,
 } from "lucide-react";
 import Link from "next/link";
-import LoanList from "@/components/loans/LoanList";
 import { Loan } from "@/lib/types/loan";
-import { getLoan, getLoans } from "@/lib/actions/loan";
+import { getLoan } from "@/lib/actions/loan";
 import EditLoanDialog from "@/components/loans/EditLoanDialog";
 import DeleteLoanDialog from "@/components/loans/DeleteLoanDialog";
-import { format } from "date-fns";
+import { addMonths, format } from "date-fns";
+import { Button } from "@/components/ui/button";
+import { Payment } from "@/lib/types/payment";
+import { formatToPeso, pmt } from "@/lib/utils";
+import PaymentList from "@/components/payments/PaymentList";
 
 const ClientPage = () => {
   const params = useParams();
   const { id } = params;
 
   const [loan, setLoan] = useState<Loan | null>(null);
-  // const [loans, setLoans] = useState<Loan[]>([]);
+  const [payments, setPayments] = useState<Payment[]>([]);
 
   const fetchLoans = async () => {
-    try {
-      setLoans((await getLoans(id as string)) ?? []);
-    } catch (error) {
-      console.log(error);
-    }
+    // try {
+    //   setLoans((await getLoans(id as string)) ?? []);
+    // } catch (error) {
+    //   console.log(error);
+    // }
   };
 
   const fetchLoan = async () => {
@@ -58,10 +61,43 @@ const ClientPage = () => {
   }, [id]);
 
   if (loan) {
+    const generatePaymentSchedule = () => {
+      const data = [];
+
+      const monthly_payment = pmt(
+        loan.interest_rate / 100,
+        loan.term,
+        loan.loan_amount,
+      );
+
+      let loan_amount = loan.loan_amount;
+
+      for (let i = 0; i < loan.term; i++) {
+        const due_date = addMonths(loan.loan_date, i + 1).toISOString();
+        const interest_paid = loan_amount * (loan.interest_rate / 100);
+        const capital_payment = monthly_payment - interest_paid;
+
+        const payment: Payment = {
+          loan_id: loan.id ?? "",
+          term: i + 1,
+          due_date: due_date,
+          principal_balance: loan_amount,
+          interest_rate: loan.interest_rate,
+          monthly_payment: monthly_payment,
+          interest_paid: interest_paid,
+          capital_paid: capital_payment,
+        };
+        loan_amount = loan_amount - capital_payment;
+        data.push(payment);
+      }
+      setPayments(data);
+    };
+
     return (
       <main className="min-h-dvh max-w-[80rem] mx-auto p-6 flex flex-col gap-6">
         <div className="flex flex-col sm:flex-row justify-between gap-4 sm:items-end">
           <div className="flex flex-col gap-4">
+            <Button onClick={generatePaymentSchedule}>Test</Button>
             <Breadcrumb>
               <BreadcrumbList>
                 <BreadcrumbItem>
@@ -122,7 +158,7 @@ const ClientPage = () => {
                 <div>
                   <h2>Loan Amount</h2>
                   <h2 className="text-black font-semibold">
-                    PHP {loan.loan_amount.toLocaleString()}
+                    {formatToPeso(loan.loan_amount)}
                   </h2>
                 </div>
               </div>
@@ -165,7 +201,7 @@ const ClientPage = () => {
             </div>
           </CardContent>
         </Card>
-        <LoanList loans={[]} onAction={fetchLoans} showAgent={true} />
+        <PaymentList payments={payments} onAction={fetchLoans} />
       </main>
     );
   } else if (loan!) {

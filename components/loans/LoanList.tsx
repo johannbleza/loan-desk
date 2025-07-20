@@ -11,6 +11,7 @@ import Link from "next/link";
 import { Loan } from "@/lib/types/loan";
 import LoanActionsDropdown from "./LoanActionsDropdown";
 import { format } from "date-fns";
+import { formatToPeso } from "@/lib/utils";
 
 interface LoanListProps {
   loans: Loan[];
@@ -43,11 +44,11 @@ const LoanList = ({
               <TableHead>Loan ID</TableHead>
               {(showAll || showClient) && <TableHead>Client</TableHead>}
               <TableHead>Loan Amount</TableHead>
-              <TableHead className="text-center">Term Completed</TableHead>
-              <TableHead className="text-center">Interest Rate</TableHead>
+              <TableHead>Term Completed</TableHead>
+              <TableHead>Interest Rate</TableHead>
               <TableHead>Loan Date</TableHead>
               {(showAll || showAgent) && <TableHead>Agent</TableHead>}
-              <TableHead className="text-center">Agent Share</TableHead>
+              <TableHead>Agent Share</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -70,11 +71,9 @@ const LoanList = ({
                     </Link>
                   </TableCell>
                 )}
-                <TableCell>PHP {loan.loan_amount.toLocaleString()}</TableCell>
-                <TableCell className="text-center">{loan.term}</TableCell>
-                <TableCell className="text-center">
-                  {loan.interest_rate}%
-                </TableCell>
+                <TableCell>{formatToPeso(loan.loan_amount)}</TableCell>
+                <TableCell>{loan.term}</TableCell>
+                <TableCell>{loan.interest_rate}%</TableCell>
                 <TableCell>{format(loan.loan_date, "MMM dd, yyyy")}</TableCell>
                 {(showAll || showAgent) && (
                   <TableCell>
@@ -86,9 +85,7 @@ const LoanList = ({
                     </Link>
                   </TableCell>
                 )}
-                <TableCell className="text-center">
-                  {loan.agent_share}%
-                </TableCell>
+                <TableCell>{loan.agent_share}%</TableCell>
                 <TableCell className="flex items-center justify-end text-right">
                   <LoanActionsDropdown loan={loan} onAction={onAction} />
                 </TableCell>

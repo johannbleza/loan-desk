@@ -96,6 +96,7 @@ const EditClientDialog = ({
       });
     }
   };
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       {isButton ? (
