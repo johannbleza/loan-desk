@@ -31,9 +31,12 @@ const formSchema = z.object({
   loan_amount: z.number().min(1, {
     message: "Loan Amount is required.",
   }),
-  term: z.number().min(1, {
-    message: "Term is required.",
-  }),
+  term: z
+    .number()
+    .min(1, {
+      message: "Term is required.",
+    })
+    .max(99, { message: "Term limit exceeded." }),
   interest_rate: z.number().min(1, {
     message: "Interest Rate is required.",
   }),
@@ -53,7 +56,7 @@ const EditLoanDialog = ({ onEdit, loan, isButton }: EditLoanDialogProps) => {
   const [open, setOpen] = useState(false);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
+    values: {
       loan_amount: loan.loan_amount,
       term: loan.term,
       interest_rate: loan.interest_rate,

@@ -2,11 +2,16 @@
 
 import { supabase } from "@/utils/supabase";
 import { Loan } from "../types/loan";
+import { deletePaymentsByLoanId, generatePaymentSchedule } from "./payments";
 
 export const createLoan = async (formData: Loan) => {
   const { data, error } = await supabase.from("loan").insert(formData).select();
   if (error) console.log(error);
-  if (data) return data;
+
+  if (data) {
+    generatePaymentSchedule(data[0]);
+    return data;
+  }
 };
 
 export const getLoans = async (client_id?: string, agent_id?: string) => {
@@ -52,7 +57,11 @@ export const editLoan = async (loan: Loan) => {
     .eq("id", loan.id)
     .select();
   if (error) console.log(error);
-  if (data) return data;
+  if (data) {
+    await deletePaymentsByLoanId(loan.id!);
+    await generatePaymentSchedule(loan);
+    return data;
+  }
 };
 
 export const deleteLoan = async (loan: Loan) => {
