@@ -126,7 +126,7 @@ const ClientPage = () => {
             </div>
           </CardContent>
         </Card>
-        <LoanList loans={loans} onAction={fetchLoans} />
+        <LoanList loans={loans} onAction={fetchLoans} showAgent={true} />
       </main>
     );
   } else if (client!) {

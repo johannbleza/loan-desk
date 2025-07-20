@@ -15,9 +15,17 @@ interface LoanListProps {
   loans: Loan[];
   onAction: () => void;
   showAll?: boolean;
+  showClient?: boolean;
+  showAgent?: boolean;
 }
 
-const LoanList = ({ loans, onAction, showAll }: LoanListProps) => {
+const LoanList = ({
+  loans,
+  onAction,
+  showAll,
+  showAgent,
+  showClient,
+}: LoanListProps) => {
   console.log(loans);
   return (
     <Card>
@@ -32,12 +40,12 @@ const LoanList = ({ loans, onAction, showAll }: LoanListProps) => {
             <TableRow>
               <TableHead className="w-8"></TableHead>
               <TableHead>Loan ID</TableHead>
-              <TableHead>Client</TableHead>
+              {(showAll || showClient) && <TableHead>Client</TableHead>}
               <TableHead>Loan Amount</TableHead>
               <TableHead className="text-center">Term Completed</TableHead>
               <TableHead className="text-center">Interest Rate</TableHead>
               <TableHead>Loan Date</TableHead>
-              <TableHead>Agent</TableHead>
+              {(showAll || showAgent) && <TableHead>Agent</TableHead>}
               <TableHead className="text-center">Agent Share</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
@@ -54,14 +62,32 @@ const LoanList = ({ loans, onAction, showAll }: LoanListProps) => {
                     loan-{loan.id?.slice(-4)}
                   </Link>
                 </TableCell>
-                <TableCell>{loan.client?.name}</TableCell>
+                {(showAll || showClient) && (
+                  <TableCell>
+                    <Link
+                      href={`/clients/${loan.client_id}`}
+                      className="hover:underline"
+                    >
+                      {loan.client?.name}
+                    </Link>
+                  </TableCell>
+                )}
                 <TableCell>PHP {loan.loan_amount.toLocaleString()}</TableCell>
                 <TableCell className="text-center">{loan.term}</TableCell>
                 <TableCell className="text-center">
                   {loan.interest_rate}%
                 </TableCell>
                 <TableCell>{loan.loan_date}</TableCell>
-                <TableCell>{loan.agent?.name}</TableCell>
+                {(showAll || showAgent) && (
+                  <TableCell>
+                    <Link
+                      href={`/agents/${loan.client_id}`}
+                      className="hover:underline"
+                    >
+                      {loan.agent?.name}
+                    </Link>
+                  </TableCell>
+                )}
                 <TableCell className="text-center">
                   {loan.agent_share}%
                 </TableCell>
