@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -112,6 +113,9 @@ const EditClientDialog = ({
       <DialogContent>
         <DialogHeader className="text-start">
           <DialogTitle className="text-2xl">Edit Client Details</DialogTitle>
+          <DialogDescription>
+            Modify the client details below.
+          </DialogDescription>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">

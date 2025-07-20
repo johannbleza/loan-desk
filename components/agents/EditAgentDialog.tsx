@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -59,6 +60,7 @@ const EditAgentDialog = ({ agent, onEdit, isButton }: EditAgentDialogProps) => {
         toast.success("Agent updated successfully!", {
           position: "top-center",
         });
+
         onEdit();
         return;
       }
@@ -82,6 +84,7 @@ const EditAgentDialog = ({ agent, onEdit, isButton }: EditAgentDialogProps) => {
       <DialogContent>
         <DialogHeader>
           <DialogTitle className="text-2xl">Edit Agent Details</DialogTitle>
+          <DialogDescription>Modify the agent details below.</DialogDescription>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">

@@ -94,4 +94,4 @@ export interface actions {
   link: string;
 }
 
-export const paymentStatus = ["Due", "Paid", "Interest Paid", "Capital Paid"];
+export const paymentStatus = ["Due", "Paid", "Interest Paid"];

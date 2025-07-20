@@ -35,7 +35,10 @@ import { Payment } from "@/lib/types/payment";
 import { isBefore } from "date-fns";
 import { paymentStatus } from "@/lib/constants";
 import { toast } from "sonner";
-import { updatePaymentStatus } from "@/lib/actions/payments";
+import {
+  handleInterestPaid,
+  updatePaymentStatus,
+} from "@/lib/actions/payments";
 
 interface UpdatePaymentStatusDialogProps {
   onEdit: () => void;
@@ -81,14 +84,21 @@ const UpdatePaymentStatusDialog = ({
       payment_mode: remarks === "Due" ? null : values.payment_mode,
       payment_date: remarks === "Due" ? null : values.payment_date,
     };
-    console.log(payload);
     try {
       const data = await updatePaymentStatus(payload);
+
+      // Handle Partial Payments
+      if (remarks == "Interest Paid") {
+        await handleInterestPaid(payment);
+      }
       if (data) {
         setOpen(false);
         toast.success("Payment updated successfully!", {
           position: "top-center",
         });
+
+        console.log(data);
+
         onEdit();
         return;
       }
@@ -104,7 +114,7 @@ const UpdatePaymentStatusDialog = ({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Badge
-          className="cursor-pointer w-full"
+          className="cursor-pointer"
           variant={payment.remarks != "Due" ? "secondary" : "outline"}
           onClick={() => {
             form.reset();

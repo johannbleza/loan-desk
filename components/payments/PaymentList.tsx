@@ -30,7 +30,6 @@ const PaymentList = ({
   showClient,
   showLoan,
 }: PaymentListProps) => {
-  console.log(payments);
   return (
     <Card>
       <CardHeader>

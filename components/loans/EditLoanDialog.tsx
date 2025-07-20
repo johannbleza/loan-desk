@@ -15,6 +15,7 @@ import { Input } from "@/components/ui/input";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -67,7 +68,6 @@ const EditLoanDialog = ({ onEdit, loan, isButton }: EditLoanDialogProps) => {
   });
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    console.log(values);
     try {
       const data = await editLoan({ id: loan.id, ...values });
       if (data) {
@@ -98,6 +98,8 @@ const EditLoanDialog = ({ onEdit, loan, isButton }: EditLoanDialogProps) => {
       <DialogContent>
         <DialogHeader className="text-start">
           <DialogTitle className="text-2xl">Edit Loan Details</DialogTitle>
+
+          <DialogDescription>Modify the loan details below.</DialogDescription>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">

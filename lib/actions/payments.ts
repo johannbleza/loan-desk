@@ -57,7 +57,7 @@ export const getPayments = async (loan_id?: string) => {
       )
     `,
       )
-      .order("term", { ascending: true });
+      .order("due_date", { ascending: true });
 
     if (loan_id) {
       query = query.eq("loan_id", loan_id);
@@ -90,6 +90,63 @@ export const updatePaymentStatus = async (payment: PaymentStatus) => {
     .from("payment")
     .update(payment)
     .eq("id", payment.id)
+    .select();
+  if (error) console.log(error);
+  if (data) return data;
+};
+
+// HANDLE INTEREST PAID
+export const handleInterestPaid = async (payment: Payment) => {
+  await addPayment({
+    loan_id: payment.loan_id,
+    term: payment.term,
+    due_date: payment.due_date,
+    principal_balance: payment.principal_balance,
+    monthly_payment: payment.monthly_payment,
+    interest_paid: payment.interest_paid,
+    capital_payment: payment.capital_payment,
+  });
+
+  await updatePayment({
+    id: payment.id,
+    loan_id: payment.loan_id,
+    term: payment.term,
+    due_date: payment.due_date,
+    principal_balance: payment.principal_balance,
+    monthly_payment: payment.interest_paid,
+    interest_paid: payment.interest_paid,
+    capital_payment: 0,
+  });
+};
+
+export const updatePayment = async (payment: Payment) => {
+  const { data, error } = await supabase
+    .from("payment")
+    .update(payment)
+    .eq("id", payment.id)
+    .select();
+  if (error) console.log(error);
+  if (data) {
+    await handleAdjustMonths(payment);
+    return data;
+  }
+};
+
+export const addPayment = async (payment: Payment) => {
+  const { data, error } = await supabase
+    .from("payment")
+    .insert(payment)
+    .select();
+  if (error) console.log(error);
+  if (data) return data;
+};
+
+export const handleAdjustMonths = async (payment: Payment) => {
+  const { data, error } = await supabase
+    .rpc("update_payment_due_date", {
+      exclude_payment_id: payment.id,
+      reference_due_date: payment.due_date,
+    })
     .select();
   if (error) console.log(error);
   if (data) return data;
