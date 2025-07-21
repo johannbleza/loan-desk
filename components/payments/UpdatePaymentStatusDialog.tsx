@@ -32,7 +32,7 @@ import {
 } from "@/components/ui/select";
 import LoanDatePicker from "../loans/LoanDatePicker";
 import { Badge } from "../ui/badge";
-import { Payment, PaymentStatus } from "@/lib/types/payment";
+import { Payment } from "@/lib/types/payment";
 import { isBefore } from "date-fns";
 import { paymentStatus } from "@/lib/constants";
 import { toast } from "sonner";
@@ -65,12 +65,7 @@ const UpdatePaymentStatusDialog = ({
     capital_payment: z.number().max(payment.principal_balance, {
       message: `Principal balance is only ${formatToPeso(payment.principal_balance)}`,
     }),
-    payment_mode:
-      remarks == "Due"
-        ? z.string().optional()
-        : z.string().min(1, {
-            message: "Mode of payment is required.",
-          }),
+    payment_mode: z.string().optional(),
     payment_date:
       remarks == "Due"
         ? z.string().optional()
@@ -92,8 +87,7 @@ const UpdatePaymentStatusDialog = ({
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     const monthly_payment = values.capital_payment + values.interest_paid;
-    const payload: PaymentStatus = {
-      id: payment.id,
+    const payload: Payment = {
       ...values,
       interest_paid:
         remarks === "Due" ? payment.interest_paid : values.interest_paid,
@@ -103,6 +97,10 @@ const UpdatePaymentStatusDialog = ({
         remarks === "Due" ? payment.monthly_payment : monthly_payment,
       payment_mode: remarks === "Due" ? null : values.payment_mode,
       payment_date: remarks === "Due" ? null : values.payment_date,
+      //
+      id: payment.id,
+      term: payment.term,
+      due_date: payment.due_date,
       principal_balance: payment.principal_balance,
       loan_id: payment.loan_id,
     };
@@ -323,7 +321,7 @@ const UpdatePaymentStatusDialog = ({
               name="payment_mode"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Mode of Payment</FormLabel>
+                  <FormLabel>Mode of Payment (Optional) </FormLabel>
                   <FormControl>
                     <Input
                       {...field}
@@ -350,7 +348,11 @@ const UpdatePaymentStatusDialog = ({
             />
 
             <div className="flex gap-3">
-              <Button type="submit" className="cursor-pointer">
+              <Button
+                type="submit"
+                className="cursor-pointer"
+                disabled={form.formState.isSubmitting}
+              >
                 Update
               </Button>
               <DialogClose asChild>

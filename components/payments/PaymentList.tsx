@@ -59,7 +59,9 @@ const PaymentList = ({
             {payments.map((payment) => (
               <TableRow
                 key={payment.id}
-                className={payment.remarks != "Due" ? "" : "text-zinc-500"}
+                className={
+                  payment.remarks != "Due" ? "font-semibold" : "text-zinc-500"
+                }
               >
                 <TableCell className="w-4">{payment.term}</TableCell>
                 {(showAll || showLoan) && (

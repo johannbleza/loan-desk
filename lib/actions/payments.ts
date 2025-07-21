@@ -3,7 +3,7 @@
 import { supabase } from "@/utils/supabase";
 import { Loan } from "../types/loan";
 import { pmt } from "../utils";
-import { Payment, PaymentStatus } from "../types/payment";
+import { Payment } from "../types/payment";
 import { addMonths } from "date-fns";
 
 export const generatePaymentSchedule = async (loan: Loan) => {
@@ -85,7 +85,7 @@ export const getPayments = async (loan_id?: string) => {
 //   if (data) return data[0];
 // };
 
-export const updatePaymentStatus = async (payment: PaymentStatus) => {
+export const updatePaymentStatus = async (payment: Payment) => {
   const { data, error } = await supabase
     .from("payment")
     .update(payment)
@@ -95,7 +95,7 @@ export const updatePaymentStatus = async (payment: PaymentStatus) => {
   if (data) return data;
 };
 
-// HANDLE INTEREST PAID
+// HANDLE INTEREST PAID ONLY
 export const handleInterestPaid = async (payment: Payment) => {
   await addPayment({
     loan_id: payment.loan_id,
@@ -108,15 +108,13 @@ export const handleInterestPaid = async (payment: Payment) => {
   });
 
   await updatePayment({
-    id: payment.id,
-    loan_id: payment.loan_id,
-    term: payment.term,
-    due_date: payment.due_date,
-    principal_balance: payment.principal_balance,
+    ...payment,
     monthly_payment: payment.interest_paid,
     interest_paid: payment.interest_paid,
     capital_payment: 0,
   });
+
+  await adjustMonths(payment);
 };
 
 export const updatePayment = async (payment: Payment) => {
@@ -126,14 +124,11 @@ export const updatePayment = async (payment: Payment) => {
     .eq("id", payment.id)
     .select();
   if (error) console.log(error);
-  if (data) {
-    await handleAdjustMonths(payment);
-    return data;
-  }
+  if (data) return data;
 };
 
 export const adjustPrincipalBalance = async (
-  payment: PaymentStatus,
+  payment: Payment,
   term: number,
 ) => {
   // Retrieve Rows
@@ -158,21 +153,50 @@ export const adjustPrincipalBalance = async (
     let principal_balance = data[0].principal_balance;
     let capital_payment = data[0].capital_payment;
     for (let i = 1; i < data.length; i++) {
-      const nextPayment = data[i];
+      const payment = data[i];
       principal_balance = principal_balance - capital_payment;
       const interest_paid =
-        principal_balance * (nextPayment.loan.interest_rate / 100);
-      capital_payment = nextPayment.monthly_payment - interest_paid;
+        principal_balance * (payment.loan.interest_rate / 100);
+      capital_payment = payment.monthly_payment - interest_paid;
       await supabase
         .from("payment")
         .update({
-          monthly_payment:
-            principal_balance <= 0 ? 0 : nextPayment.monthly_payment,
+          monthly_payment: principal_balance <= 0 ? 0 : payment.monthly_payment,
           principal_balance: principal_balance <= 0 ? 0 : principal_balance,
           interest_paid: principal_balance <= 0 ? 0 : interest_paid,
           capital_payment: principal_balance <= 0 ? 0 : capital_payment,
         })
-        .eq("id", nextPayment.id);
+        .eq("id", payment.id);
+    }
+    return data;
+  }
+};
+
+export const adjustMonths = async (payment: Payment) => {
+  // Retrieve payments
+  const { data, error } = await supabase
+    .from("payment")
+    .select()
+    .gte("due_date", payment.due_date)
+    .eq("loan_id", payment.loan_id)
+    .neq("id", payment.id)
+    .order("due_date", { ascending: true });
+
+  if (error) console.log(error);
+
+  if (data) {
+    // Update next payments
+    for (let i = 0; i < data.length; i++) {
+      const payment = data[i];
+      const term = payment.term + 1;
+      const due_date = addMonths(payment.due_date, 1).toLocaleString();
+      await supabase
+        .from("payment")
+        .update({
+          term: term,
+          due_date: due_date,
+        })
+        .eq("id", payment.id);
     }
     return data;
   }
@@ -182,17 +206,6 @@ export const addPayment = async (payment: Payment) => {
   const { data, error } = await supabase
     .from("payment")
     .insert(payment)
-    .select();
-  if (error) console.log(error);
-  if (data) return data;
-};
-
-export const handleAdjustMonths = async (payment: Payment) => {
-  const { data, error } = await supabase
-    .rpc("update_payment_due_date", {
-      exclude_payment_id: payment.id,
-      reference_due_date: payment.due_date,
-    })
     .select();
   if (error) console.log(error);
   if (data) return data;
