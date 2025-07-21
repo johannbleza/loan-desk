@@ -76,15 +76,6 @@ export const getPayments = async (loan_id?: string) => {
   }
 };
 
-// export const getLoan = async (loan_id: string) => {
-//   const { data, error } = await supabase
-//     .from("loan")
-//     .select(`*, agent(name), client(name)`)
-//     .eq("id", loan_id);
-//   if (error) console.log(error);
-//   if (data) return data[0];
-// };
-
 export const updatePaymentStatus = async (payment: Payment) => {
   const { data, error } = await supabase
     .from("payment")
@@ -127,10 +118,7 @@ export const updatePayment = async (payment: Payment) => {
   if (data) return data;
 };
 
-export const adjustPrincipalBalance = async (
-  payment: Payment,
-  term: number,
-) => {
+export const adjustPrincipalBalance = async (payment: Payment) => {
   // Retrieve Rows
   const { data, error } = await supabase
     .from("payment")
@@ -144,7 +132,7 @@ export const adjustPrincipalBalance = async (
       )
     `,
     )
-    .gte("term", term)
+    .gte("term", payment.term)
     .eq("loan_id", payment.loan_id)
     .order("due_date", { ascending: true });
   if (error) console.log(error);

@@ -112,14 +112,15 @@ const UpdatePaymentStatusDialog = ({
         values.capital_payment == 0
       ) {
         await handleInterestPaid(payment);
+      } else if (values.capital_payment > payment.capital_payment) {
+        //Greater than
+        await adjustPrincipalBalance(payload);
+      } else if (values.capital_payment < payment.capital_payment) {
+        //Less Than
       }
 
       // Adjust Principal Balance
-      const adjustPayments = await adjustPrincipalBalance(
-        payload,
-        payment.term,
-      );
-      if (data && adjustPayments) {
+      if (data) {
         setOpen(false);
         toast.success("Payment updated successfully!", {
           position: "top-center",
