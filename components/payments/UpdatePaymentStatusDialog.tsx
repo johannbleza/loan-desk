@@ -40,6 +40,7 @@ import {
   handleInterestPaid,
   adjustPrincipalBalance,
   updatePaymentStatus,
+  handleCapitalPaymentLessThan,
 } from "@/lib/actions/payments";
 import { formatToPeso } from "@/lib/utils";
 import { Checkbox } from "../ui/checkbox";
@@ -117,6 +118,8 @@ const UpdatePaymentStatusDialog = ({
         await adjustPrincipalBalance(payload);
       } else if (values.capital_payment < payment.capital_payment) {
         //Less Than
+        const test = await handleCapitalPaymentLessThan(payment);
+        console.log(test);
       }
 
       // Adjust Principal Balance
@@ -271,6 +274,8 @@ const UpdatePaymentStatusDialog = ({
                           if (checked) {
                             field.onChange(payment.capital_payment);
                             form.setValue("remarks", "Paid");
+
+                            setRemarks("Paid");
 
                             form.setValue(
                               "interest_paid",

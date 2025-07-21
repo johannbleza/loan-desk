@@ -108,6 +108,40 @@ export const handleInterestPaid = async (payment: Payment) => {
   await adjustMonths(payment);
 };
 
+//HANDLE CAPITAL PAYMENT LESS THAN
+export const handleCapitalPaymentLessThan = async (payment: Payment) => {
+  const { data, error } = await supabase
+    .from("payment")
+    .select(
+      `
+      *,
+      loan:loan_id (
+        *,
+        client:client_id (name),
+        agent:agent_id (name)
+      )
+    `,
+    )
+    .gte("term", payment.term)
+    .eq("loan_id", payment.loan_id)
+    .order("due_date", { ascending: true });
+  if (error) console.log(error);
+  if (data) {
+    const lastPayment = data.at(-1);
+
+    await addPayment({
+      loan_id: lastPayment.loan_id,
+      term: lastPayment.term + 1,
+      due_date: addMonths(lastPayment.due_date, 1).toLocaleString(),
+      principal_balance: lastPayment.principal_balance,
+      monthly_payment: lastPayment.monthly_payment,
+      interest_paid: lastPayment.interest_paid,
+      capital_payment: lastPayment.capital_payment,
+    });
+  }
+  await adjustPrincipalBalance(payment);
+};
+
 export const updatePayment = async (payment: Payment) => {
   const { data, error } = await supabase
     .from("payment")
