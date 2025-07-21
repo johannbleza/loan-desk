@@ -12,6 +12,7 @@ import { Loan } from "@/lib/types/loan";
 import LoanActionsDropdown from "./LoanActionsDropdown";
 import { format } from "date-fns";
 import { formatToPeso } from "@/lib/utils";
+import TermCompleted from "./TermCompleted";
 
 interface LoanListProps {
   loans: Loan[];
@@ -53,44 +54,53 @@ const LoanList = ({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {loans.map((loan, index) => (
-              <TableRow key={loan.id}>
-                <TableCell className="w-4">{index + 1}</TableCell>
-                <TableCell>
-                  <Link href={`/loans/${loan.id}`} className="hover:underline">
-                    L-{loan.id?.slice(-4).toUpperCase()}
-                  </Link>
-                </TableCell>
-                {(showAll || showClient) && (
+            {loans.map((loan, index) => {
+              return (
+                <TableRow key={loan.id}>
+                  <TableCell className="w-4">{index + 1}</TableCell>
                   <TableCell>
                     <Link
-                      href={`/clients/${loan.client_id}`}
+                      href={`/loans/${loan.id}`}
                       className="hover:underline"
                     >
-                      {loan.client?.name}
+                      L-{loan.id?.slice(-4).toUpperCase()}
                     </Link>
                   </TableCell>
-                )}
-                <TableCell>{formatToPeso(loan.loan_amount)}</TableCell>
-                <TableCell>{loan.term}</TableCell>
-                <TableCell>{loan.interest_rate}%</TableCell>
-                <TableCell>{format(loan.loan_date, "MMM dd, yyyy")}</TableCell>
-                {(showAll || showAgent) && (
+                  {(showAll || showClient) && (
+                    <TableCell>
+                      <Link
+                        href={`/clients/${loan.client_id}`}
+                        className="hover:underline"
+                      >
+                        {loan.client?.name}
+                      </Link>
+                    </TableCell>
+                  )}
+                  <TableCell>{formatToPeso(loan.loan_amount)}</TableCell>
                   <TableCell>
-                    <Link
-                      href={`/agents/${loan.agent_id}`}
-                      className="hover:underline"
-                    >
-                      {loan.agent?.name}
-                    </Link>
+                    <TermCompleted loan={loan} />
                   </TableCell>
-                )}
-                <TableCell>{loan.agent_share}%</TableCell>
-                <TableCell className="flex items-center justify-end text-right">
-                  <LoanActionsDropdown loan={loan} onAction={onAction} />
-                </TableCell>
-              </TableRow>
-            ))}
+                  <TableCell>{loan.interest_rate}%</TableCell>
+                  <TableCell>
+                    {format(loan.loan_date, "MMM dd, yyyy")}
+                  </TableCell>
+                  {(showAll || showAgent) && (
+                    <TableCell>
+                      <Link
+                        href={`/agents/${loan.agent_id}`}
+                        className="hover:underline"
+                      >
+                        {loan.agent?.name}
+                      </Link>
+                    </TableCell>
+                  )}
+                  <TableCell>{loan.agent_share}%</TableCell>
+                  <TableCell className="flex items-center justify-end text-right">
+                    <LoanActionsDropdown loan={loan} onAction={onAction} />
+                  </TableCell>
+                </TableRow>
+              );
+            })}
           </TableBody>
         </Table>
       </CardContent>

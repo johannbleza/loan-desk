@@ -13,4 +13,5 @@ export interface Loan {
   client?: {
     name: string;
   };
+  payment?: Array;
 }

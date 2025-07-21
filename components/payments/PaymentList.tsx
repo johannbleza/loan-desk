@@ -120,7 +120,7 @@ const PaymentList = ({
               </TableRow>
             ))}
             {/* Total */}
-            <TableRow>
+            <TableRow className="font-semibold">
               <TableCell></TableCell>
               <TableCell></TableCell>
               <TableCell></TableCell>

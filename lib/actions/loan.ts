@@ -18,7 +18,17 @@ export const getLoans = async (client_id?: string, agent_id?: string) => {
   try {
     let query = supabase
       .from("loan")
-      .select(`*, agent(name), client(name)`)
+      .select(
+        `
+        *,
+        agent(name), 
+        client(name),
+        payment(
+          count
+        )
+      `,
+      )
+      .neq("payment.remarks", "Due")
       .order("created_at", { ascending: true });
 
     if (client_id) {
@@ -44,10 +54,21 @@ export const getLoans = async (client_id?: string, agent_id?: string) => {
 export const getLoan = async (loan_id: string) => {
   const { data, error } = await supabase
     .from("loan")
-    .select(`*, agent(name), client(name)`)
-    .eq("id", loan_id);
+    .select(
+      `
+        *,
+        agent(name), 
+        client(name),
+        payment(
+          count
+        )
+      `,
+    )
+    .neq("payment.remarks", "Due")
+    .eq("id", loan_id)
+    .single();
   if (error) console.log(error);
-  if (data) return data[0];
+  if (data) return data;
 };
 
 export const editLoan = async (loan: Loan) => {

@@ -10,17 +10,6 @@ import {
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import {
-  BadgePercent,
-  Calendar1,
-  CalendarDays,
-  CheckCheck,
-  HandCoins,
-  Percent,
-  PhilippinePeso,
-  User,
-  UserCheck,
-} from "lucide-react";
 import Link from "next/link";
 import { Loan } from "@/lib/types/loan";
 import { getLoan } from "@/lib/actions/loan";
@@ -31,6 +20,7 @@ import { Payment } from "@/lib/types/payment";
 import { formatToPeso } from "@/lib/utils";
 import PaymentList from "@/components/payments/PaymentList";
 import { getPayments } from "@/lib/actions/payments";
+import TermCompleted from "@/components/loans/TermCompleted";
 
 const ClientPage = () => {
   const params = useParams();
@@ -62,6 +52,7 @@ const ClientPage = () => {
   }, [id]);
 
   if (loan) {
+    console.log(loan);
     return (
       <main className="min-h-dvh max-w-[80rem] mx-auto p-6 flex flex-col gap-6">
         <div className="flex flex-col sm:flex-row justify-between gap-4 sm:items-end">
@@ -104,86 +95,69 @@ const ClientPage = () => {
         <Card>
           <CardContent className="flex flex-col gap-4">
             <div className="flex gap-2 items-center">
-              <HandCoins />
               <h1 className="text-2xl font-semibold">Loan Details</h1>
             </div>
             <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="flex gap-4 items-center text-zinc-500">
-                <User />
-                <div>
-                  <h2>Client</h2>
-                  <Link href={`/clients/${loan.client_id}`}>
-                    <h2 className="text-black font-semibold hover:underline">
-                      {loan.client?.name}
-                    </h2>
-                  </Link>
-                </div>
-              </div>
-              <div className="flex gap-4 items-center text-zinc-500">
-                <Calendar1 />
-                <div>
-                  <h2>Loan Start Date</h2>
-                  <h2 className="text-black font-semibold">
-                    {format(loan.loan_date, "MMM dd, yyyy")}
+              <div>
+                <h2>Client:</h2>
+                <Link href={`/clients/${loan.client_id}`}>
+                  <h2 className="text-black font-semibold hover:underline">
+                    {loan.client?.name}
                   </h2>
-                </div>
+                </Link>
               </div>
-              <div className="flex gap-4 items-center text-zinc-500">
-                <PhilippinePeso />
-                <div>
-                  <h2>Loan Amount</h2>
-                  <h2 className="text-black font-semibold">
-                    {formatToPeso(loan.loan_amount)}
+              <div>
+                <h2>Loan Start Date:</h2>
+                <h2 className="text-black font-semibold">
+                  {format(loan.loan_date, "MMM dd, yyyy")}
+                </h2>
+              </div>
+              <div>
+                <h2>Loan Amount:</h2>
+                <h2 className="text-black font-semibold">
+                  {formatToPeso(loan.loan_amount)}
+                </h2>
+              </div>
+              <div>
+                <h2>Loan Term:</h2>
+                <h2 className="text-black font-semibold">{loan.term}</h2>
+              </div>
+              <div>
+                <h2>Interest:</h2>
+                <h2 className="text-black font-semibold">
+                  {loan.interest_rate}%
+                </h2>
+              </div>
+              <div>
+                <h2>Assigned Agent:</h2>
+                <Link href={`/agents/${loan.agent_id}`}>
+                  <h2 className="text-black hover:underline font-semibold">
+                    {loan.agent!.name}
                   </h2>
-                </div>
+                </Link>
               </div>
-              <div className="flex gap-4 items-center text-zinc-500">
-                <CalendarDays />
-                <div>
-                  <h2>Loan Term</h2>
-                  <h2 className="text-black font-semibold">{loan.term}</h2>
-                </div>
+              <div>
+                <h2>Agent Share:</h2>
+                <h2 className="text-black font-semibold">
+                  {loan.agent_share}%
+                </h2>
               </div>
-              <div className="flex gap-4 items-center text-zinc-500">
-                <Percent />
-                <div>
-                  <h2>Interest</h2>
-                  <h2 className="text-black font-semibold">
-                    {loan.interest_rate}%
-                  </h2>
-                </div>
-              </div>
-              <div className="flex gap-4 items-center text-zinc-500">
-                <UserCheck />
-                <div>
-                  <h2>Assigned Agent</h2>
-                  <Link href={`/agents/${loan.agent_id}`}>
-                    <h2 className="text-black hover:underline font-semibold">
-                      {loan.agent!.name}
-                    </h2>
-                  </Link>
-                </div>
-              </div>
-              <div className="flex gap-4 items-center text-zinc-500">
-                <BadgePercent />
-                <div>
-                  <h2>Agent Share</h2>
-                  <h2 className="text-black font-semibold">
-                    {loan.agent_share}%
-                  </h2>
-                </div>
-              </div>
-              <div className="flex gap-4 items-center text-zinc-500">
-                <CheckCheck />
-                <div>
-                  <h2>Term Completed</h2>
-                  <h2 className="text-black font-semibold">1/2</h2>
-                </div>
+              <div>
+                <h2>Term Completed:</h2>
+                <h2 className="text-black font-semibold">
+                  <TermCompleted loan={loan} />
+                </h2>
               </div>
             </div>
           </CardContent>
         </Card>
-        <PaymentList payments={payments} onAction={fetchPayments} />
+        <PaymentList
+          payments={payments}
+          onAction={() => {
+            fetchLoan();
+            fetchPayments();
+          }}
+        />
       </main>
     );
   } else if (loan!) {
