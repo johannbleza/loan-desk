@@ -142,6 +142,14 @@ export const handleCapitalPaymentLessThan = async (payment: Payment) => {
   await adjustPrincipalBalance(payment);
 };
 
+export const deleteZeroPrincipalBalance = async () => {
+  const { error } = await supabase
+    .from("payment")
+    .delete()
+    .eq("principal_balance", 0);
+  if (error) console.log(error);
+};
+
 export const updatePayment = async (payment: Payment) => {
   const { data, error } = await supabase
     .from("payment")
@@ -152,7 +160,7 @@ export const updatePayment = async (payment: Payment) => {
   if (data) return data;
 };
 
-export const adjustPrincipalBalanceDefault = async (payment: Payment) => {
+export const adjustPrincipalBalance = async (payment: Payment) => {
   // Retrieve Rows
   const { data, error } = await supabase
     .from("payment")
@@ -190,61 +198,65 @@ export const adjustPrincipalBalanceDefault = async (payment: Payment) => {
         })
         .eq("id", payment.id);
     }
+    await deleteZeroPrincipalBalance();
     return data;
   }
 };
 
-export const adjustPrincipalBalance = async (payment: Payment) => {
-  // Retrieve Rows
-  const { data, error } = await supabase
-    .from("payment")
-    .select(
-      `
-      *,
-      loan:loan_id (
-        *,
-        client:client_id (name),
-        agent:agent_id (name)
-      )
-    `,
-    )
-    .gte("term", payment.term)
-    .eq("loan_id", payment.loan_id)
-    .order("due_date", { ascending: true });
-  if (error) console.log(error);
-  if (data) {
-    // Update Next Row
-    let principal_balance = data[0].principal_balance;
-    let capital_payment = data[0].capital_payment;
-    for (let i = 1; i < data.length; i++) {
-      const payment = data[i];
-      principal_balance = principal_balance - capital_payment;
-      const interest_paid =
-        principal_balance * (payment.loan.interest_rate / 100);
-      capital_payment = payment.monthly_payment - interest_paid;
-      await supabase
-        .from("payment")
-        .update({
-          monthly_payment:
-            principal_balance <= 0
-              ? 0
-              : payment.monthly_payment >= principal_balance
-                ? principal_balance
-                : payment.monthly_payment,
-          principal_balance: principal_balance <= 0 ? 0 : principal_balance,
-          interest_paid: principal_balance <= 0 ? 0 : interest_paid,
-          capital_payment:
-            principal_balance <= 0
-              ? 0
-              : payment.monthly_payment >= principal_balance
-                ? principal_balance - interest_paid
-                : capital_payment,
-        })
-        .eq("id", payment.id);
-    }
-    return data;
-  }
-};
+// export const adjustPrincipalBalance = async (payment: Payment) => {
+//   // Retrieve Rows
+//   const { data, error } = await supabase
+//     .from("payment")
+//     .select(
+//       `
+//       *,
+//       loan:loan_id (
+//         *,
+//         client:client_id (name),
+//         agent:agent_id (name)
+//       )
+//     `,
+//     )
+//     .gte("term", payment.term)
+//     .eq("loan_id", payment.loan_id)
+//     .order("due_date", { ascending: true });
+//   if (error) console.log(error);
+//   if (data) {
+//     // Update Next Row
+//     let principal_balance = data[0].principal_balance;
+//     let capital_payment = data[0].capital_payment;
+//     for (let i = 1; i < data.length; i++) {
+//       const payment = data[i];
+//       principal_balance = principal_balance - capital_payment;
+//       const interest_paid =
+//         principal_balance * (payment.loan.interest_rate / 100);
+//       capital_payment = payment.monthly_payment - interest_paid;
+//       await supabase
+//         .from("payment")
+//         .update({
+//           monthly_payment:
+//             principal_balance <= 0
+//               ? 0
+//               : payment.monthly_payment >= principal_balance
+//                 ? principal_balance
+//                 : payment.monthly_payment,
+//           principal_balance: principal_balance <= 0 ? 0 : principal_balance,
+//           interest_paid: principal_balance <= 0 ? 0 : interest_paid,
+//           capital_payment:
+//             principal_balance <= 0
+//               ? 0
+//               : payment.monthly_payment >= principal_balance
+//                 ? principal_balance - interest_paid
+//                 : capital_payment,
+//         })
+//         .eq("id", payment.id);
+//     }
+//     await deleteZeroPrincipalBalance();
+//     return data;
+//   }
+// };
+
+///TODO
 
 export const adjustMonths = async (payment: Payment) => {
   // Retrieve payments

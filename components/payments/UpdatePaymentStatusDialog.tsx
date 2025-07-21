@@ -306,6 +306,8 @@ const UpdatePaymentStatusDialog = ({
                         placeholder={formatToPeso(payment.capital_payment)}
                         onChange={(e) => {
                           field.onChange(Number(e.target.value));
+                          form.setValue("remarks", "Paid");
+                          form.setValue("interest_paid", payment.interest_paid);
 
                           setMonthlyPayment(
                             form.getValues("interest_paid") +
