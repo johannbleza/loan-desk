@@ -20,7 +20,6 @@ import { Payment } from "@/lib/types/payment";
 import { formatToPeso } from "@/lib/utils";
 import PaymentList from "@/components/payments/PaymentList";
 import { getPayments } from "@/lib/actions/payments";
-import TermCompleted from "@/components/loans/TermCompleted";
 import ResetPaymentsDialog from "@/components/loans/ResetPaymentsDialog";
 
 const LoanPage = () => {
@@ -146,7 +145,7 @@ const LoanPage = () => {
               <div>
                 <h2>Term Completed:</h2>
                 <h2 className="text-black font-semibold">
-                  <TermCompleted loan={loan} />
+                  {loan.payment[0].count}/{payments.length}
                 </h2>
               </div>
             </div>

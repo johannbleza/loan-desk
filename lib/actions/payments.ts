@@ -76,14 +76,14 @@ export const getPayments = async (loan_id?: string) => {
   }
 };
 
-export const getLoan = async (loan_id: string) => {
-  const { data, error } = await supabase
-    .from("loan")
-    .select(`*, agent(name), client(name)`)
-    .eq("id", loan_id);
-  if (error) console.log(error);
-  if (data) return data[0];
-};
+// export const getLoan = async (loan_id: string) => {
+//   const { data, error } = await supabase
+//     .from("loan")
+//     .select(`*, agent(name), client(name)`)
+//     .eq("id", loan_id);
+//   if (error) console.log(error);
+//   if (data) return data[0];
+// };
 
 export const updatePaymentStatus = async (payment: PaymentStatus) => {
   const { data, error } = await supabase
@@ -139,7 +139,16 @@ export const adjustPrincipalBalance = async (
   // Retrieve Rows
   const { data, error } = await supabase
     .from("payment")
-    .select()
+    .select(
+      `
+      *,
+      loan:loan_id (
+        *,
+        client:client_id (name),
+        agent:agent_id (name)
+      )
+    `,
+    )
     .gte("term", term)
     .eq("loan_id", payment.loan_id)
     .order("due_date", { ascending: true });
@@ -151,7 +160,8 @@ export const adjustPrincipalBalance = async (
     for (let i = 1; i < data.length; i++) {
       const nextPayment = data[i];
       principal_balance = principal_balance - capital_payment;
-      const interest_paid = principal_balance * 0.1;
+      const interest_paid =
+        principal_balance * (nextPayment.loan.interest_rate / 100);
       capital_payment = nextPayment.monthly_payment - interest_paid;
       await supabase
         .from("payment")

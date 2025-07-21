@@ -38,13 +38,11 @@ import { paymentStatus } from "@/lib/constants";
 import { toast } from "sonner";
 import {
   handleInterestPaid,
-  updateNextPayment,
   adjustPrincipalBalance,
   updatePaymentStatus,
 } from "@/lib/actions/payments";
 import { formatToPeso } from "@/lib/utils";
 import { Checkbox } from "../ui/checkbox";
-import { te } from "date-fns/locale";
 
 interface UpdatePaymentStatusDialogProps {
   onEdit: () => void;
@@ -83,7 +81,7 @@ const UpdatePaymentStatusDialog = ({
   const [open, setOpen] = useState(false);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    values: {
+    defaultValues: {
       remarks: payment.remarks!,
       interest_paid: 0,
       capital_payment: 0,
@@ -118,10 +116,12 @@ const UpdatePaymentStatusDialog = ({
         await handleInterestPaid(payment);
       }
 
-      //Capital Payment is Greater than
-      const testPayments = await adjustPrincipalBalance(payload, payment.term);
-      console.log(testPayments);
-      if (data) {
+      // Adjust Principal Balance
+      const adjustPayments = await adjustPrincipalBalance(
+        payload,
+        payment.term,
+      );
+      if (data && adjustPayments) {
         setOpen(false);
         toast.success("Payment updated successfully!", {
           position: "top-center",
@@ -225,6 +225,7 @@ const UpdatePaymentStatusDialog = ({
                         onCheckedChange={(checked) => {
                           if (checked) {
                             field.onChange(payment.interest_paid);
+                            setRemarks("Paid");
                             form.setValue("remarks", "Paid");
                           } else {
                             field.onChange(0);
@@ -271,6 +272,11 @@ const UpdatePaymentStatusDialog = ({
                           if (checked) {
                             field.onChange(payment.capital_payment);
                             form.setValue("remarks", "Paid");
+
+                            form.setValue(
+                              "interest_paid",
+                              payment.interest_paid,
+                            );
                           } else {
                             field.onChange(0);
                             if (
