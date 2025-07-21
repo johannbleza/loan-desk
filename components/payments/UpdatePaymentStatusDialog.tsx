@@ -5,6 +5,7 @@ import { z } from "zod";
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -31,14 +32,19 @@ import {
 } from "@/components/ui/select";
 import LoanDatePicker from "../loans/LoanDatePicker";
 import { Badge } from "../ui/badge";
-import { Payment } from "@/lib/types/payment";
+import { Payment, PaymentStatus } from "@/lib/types/payment";
 import { isBefore } from "date-fns";
 import { paymentStatus } from "@/lib/constants";
 import { toast } from "sonner";
 import {
   handleInterestPaid,
+  updateNextPayment,
+  adjustPrincipalBalance,
   updatePaymentStatus,
 } from "@/lib/actions/payments";
+import { formatToPeso } from "@/lib/utils";
+import { Checkbox } from "../ui/checkbox";
+import { te } from "date-fns/locale";
 
 interface UpdatePaymentStatusDialogProps {
   onEdit: () => void;
@@ -50,9 +56,16 @@ const UpdatePaymentStatusDialog = ({
   payment,
 }: UpdatePaymentStatusDialogProps) => {
   const [remarks, setRemarks] = useState(payment.remarks);
+  const [monthlyPayment, setMonthlyPayment] = useState(0);
   const formSchema = z.object({
     remarks: z.string().min(1, {
       message: "Payment status is required.",
+    }),
+    interest_paid: z.number().max(payment.interest_paid, {
+      message: `Interest is only ${formatToPeso(payment.interest_paid)}`,
+    }),
+    capital_payment: z.number().max(payment.principal_balance, {
+      message: `Principal balance is only ${formatToPeso(payment.principal_balance)}`,
     }),
     payment_mode:
       remarks == "Due"
@@ -72,33 +85,47 @@ const UpdatePaymentStatusDialog = ({
     resolver: zodResolver(formSchema),
     values: {
       remarks: payment.remarks!,
+      interest_paid: 0,
+      capital_payment: 0,
       payment_mode: payment.payment_mode ?? "",
       payment_date: payment.payment_date ?? "",
     },
   });
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    const payload = {
-      id: payment.id!,
+    const monthly_payment = values.capital_payment + values.interest_paid;
+    const payload: PaymentStatus = {
+      id: payment.id,
       ...values,
+      interest_paid:
+        remarks === "Due" ? payment.interest_paid : values.interest_paid,
+      capital_payment:
+        remarks === "Due" ? payment.capital_payment : values.capital_payment,
+      monthly_payment:
+        remarks === "Due" ? payment.monthly_payment : monthly_payment,
       payment_mode: remarks === "Due" ? null : values.payment_mode,
       payment_date: remarks === "Due" ? null : values.payment_date,
+      principal_balance: payment.principal_balance,
+      loan_id: payment.loan_id,
     };
     try {
       const data = await updatePaymentStatus(payload);
-
-      // Handle Partial Payments
-      if (remarks == "Interest Paid") {
+      // If Interest is only Paid
+      if (
+        values.interest_paid == payment.interest_paid &&
+        values.capital_payment == 0
+      ) {
         await handleInterestPaid(payment);
       }
+
+      //Capital Payment is Greater than
+      const testPayments = await adjustPrincipalBalance(payload, payment.term);
+      console.log(testPayments);
       if (data) {
         setOpen(false);
         toast.success("Payment updated successfully!", {
           position: "top-center",
         });
-
-        console.log(data);
-
         onEdit();
         return;
       }
@@ -146,6 +173,25 @@ const UpdatePaymentStatusDialog = ({
                     value={field.value}
                     defaultValue={payment.remarks}
                     onValueChange={(value) => {
+                      if (value == "Paid") {
+                        form.setValue("interest_paid", payment.interest_paid);
+                        form.setValue(
+                          "capital_payment",
+                          payment.capital_payment,
+                        );
+
+                        setMonthlyPayment(
+                          form.getValues("interest_paid") +
+                            form.getValues("capital_payment"),
+                        );
+                      } else {
+                        form.setValue("interest_paid", 0);
+                        form.setValue("capital_payment", 0);
+                        setMonthlyPayment(
+                          form.getValues("interest_paid") +
+                            form.getValues("capital_payment"),
+                        );
+                      }
                       field.onChange(value);
                       setRemarks(value);
                     }}
@@ -167,6 +213,105 @@ const UpdatePaymentStatusDialog = ({
                 </FormItem>
               )}
             />
+            <div className="grid grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="interest_paid"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>
+                      <Checkbox
+                        checked={field.value !== 0}
+                        onCheckedChange={(checked) => {
+                          if (checked) {
+                            field.onChange(payment.interest_paid);
+                            form.setValue("remarks", "Paid");
+                          } else {
+                            field.onChange(0);
+                            if (
+                              form.getValues("capital_payment") == 0 &&
+                              form.getValues("interest_paid") == 0
+                            ) {
+                              form.setValue("remarks", "Due");
+                            }
+                          }
+                          setMonthlyPayment(
+                            form.getValues("capital_payment") +
+                              (checked ? payment.interest_paid : 0),
+                          );
+                        }}
+                      />
+                      <span>Interest Paid</span>
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        type="number"
+                        readOnly={true}
+                        value={field.value === 0 ? "" : field.value}
+                        placeholder={formatToPeso(payment.interest_paid)}
+                        onChange={(e) => {
+                          field.onChange(Number(e.target.value));
+                        }}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="capital_payment"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>
+                      <Checkbox
+                        checked={field.value !== 0}
+                        onCheckedChange={(checked) => {
+                          if (checked) {
+                            field.onChange(payment.capital_payment);
+                            form.setValue("remarks", "Paid");
+                          } else {
+                            field.onChange(0);
+                            if (
+                              form.getValues("capital_payment") == 0 &&
+                              form.getValues("interest_paid") == 0
+                            ) {
+                              form.setValue("remarks", "Due");
+                            }
+                          }
+                          setMonthlyPayment(
+                            form.getValues("interest_paid") +
+                              (checked ? payment.capital_payment : 0),
+                          );
+                        }}
+                      />
+                      <span>Capital Payment</span>
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        type="number"
+                        value={field.value === 0 ? "" : field.value}
+                        placeholder={formatToPeso(payment.capital_payment)}
+                        onChange={(e) => {
+                          field.onChange(Number(e.target.value));
+
+                          setMonthlyPayment(
+                            form.getValues("interest_paid") +
+                              Number(e.target.value),
+                          );
+                        }}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            <FormDescription>
+              Monthly Payment: {formatToPeso(monthlyPayment)}
+            </FormDescription>
             <FormField
               control={form.control}
               name="payment_mode"

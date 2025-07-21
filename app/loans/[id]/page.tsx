@@ -23,7 +23,7 @@ import { getPayments } from "@/lib/actions/payments";
 import TermCompleted from "@/components/loans/TermCompleted";
 import ResetPaymentsDialog from "@/components/loans/ResetPaymentsDialog";
 
-const ClientPage = () => {
+const LoanPage = () => {
   const params = useParams();
   const { id } = params;
 
@@ -53,7 +53,6 @@ const ClientPage = () => {
   }, [id]);
 
   if (loan) {
-    console.log(loan);
     return (
       <main className="min-h-dvh max-w-[80rem] mx-auto p-6 flex flex-col gap-6">
         <div className="flex flex-col sm:flex-row justify-between gap-4 sm:items-end">
@@ -171,4 +170,4 @@ const ClientPage = () => {
   }
 };
 
-export default ClientPage;
+export default LoanPage;

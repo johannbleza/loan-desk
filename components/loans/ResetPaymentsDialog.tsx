@@ -30,7 +30,6 @@ const ResetPaymentsDialog = ({ loan, onReset }: DeleteLoanDialogProps) => {
       });
       onReset();
       return;
-      toast.error("Error reseting loan!", { position: "top-center" });
     } catch (error) {
       toast.error(`Error reseting loan! ${error}`, {
         position: "top-center",

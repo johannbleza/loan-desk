@@ -18,7 +18,12 @@ export interface Payment {
 }
 
 export interface PaymentStatus {
-  id: string;
+  id?: string;
+  loan_id?: string;
+  principal_balance: number;
+  monthly_payment?: number;
+  interest_paid: number;
+  capital_payment: number;
   payment_date?: string | null;
   payment_mode?: string | null;
   remarks: string;

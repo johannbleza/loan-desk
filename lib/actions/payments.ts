@@ -132,6 +132,42 @@ export const updatePayment = async (payment: Payment) => {
   }
 };
 
+export const adjustPrincipalBalance = async (
+  payment: PaymentStatus,
+  term: number,
+) => {
+  // Retrieve Rows
+  const { data, error } = await supabase
+    .from("payment")
+    .select()
+    .gte("term", term)
+    .eq("loan_id", payment.loan_id)
+    .order("due_date", { ascending: true });
+  if (error) console.log(error);
+  if (data) {
+    // Update Next Row
+    let principal_balance = data[0].principal_balance;
+    let capital_payment = data[0].capital_payment;
+    for (let i = 1; i < data.length; i++) {
+      const nextPayment = data[i];
+      principal_balance = principal_balance - capital_payment;
+      const interest_paid = principal_balance * 0.1;
+      capital_payment = nextPayment.monthly_payment - interest_paid;
+      await supabase
+        .from("payment")
+        .update({
+          monthly_payment:
+            principal_balance <= 0 ? 0 : nextPayment.monthly_payment,
+          principal_balance: principal_balance <= 0 ? 0 : principal_balance,
+          interest_paid: principal_balance <= 0 ? 0 : interest_paid,
+          capital_payment: principal_balance <= 0 ? 0 : capital_payment,
+        })
+        .eq("id", nextPayment.id);
+    }
+    return data;
+  }
+};
+
 export const addPayment = async (payment: Payment) => {
   const { data, error } = await supabase
     .from("payment")
