@@ -85,6 +85,11 @@ export const editLoan = async (loan: Loan) => {
   }
 };
 
+export const resetLoan = async (loan: Loan) => {
+  await deletePaymentsByLoanId(loan.id!);
+  await generatePaymentSchedule(loan);
+};
+
 export const deleteLoan = async (loan: Loan) => {
   const { data, error } = await supabase
     .from("loan")

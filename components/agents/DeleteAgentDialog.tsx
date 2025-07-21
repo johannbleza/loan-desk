@@ -69,7 +69,7 @@ const DeleteAgentDialog = ({
             action cannot be undone and will permanently remove all associated
             data.
           </DialogDescription>
-          <div className="flex gap-3">
+          <div className="flex gap-3 mt-2">
             <Button className="cursor-pointer" onClick={handleDelete}>
               Confirm Delete
             </Button>

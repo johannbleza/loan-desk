@@ -21,6 +21,7 @@ import { formatToPeso } from "@/lib/utils";
 import PaymentList from "@/components/payments/PaymentList";
 import { getPayments } from "@/lib/actions/payments";
 import TermCompleted from "@/components/loans/TermCompleted";
+import ResetPaymentsDialog from "@/components/loans/ResetPaymentsDialog";
 
 const ClientPage = () => {
   const params = useParams();
@@ -77,6 +78,7 @@ const ClientPage = () => {
             </h1>
           </div>
           <div className="flex flex-wrap gap-3">
+            <ResetPaymentsDialog loan={loan} onReset={fetchPayments} />
             <EditLoanDialog
               loan={loan}
               onEdit={() => {
