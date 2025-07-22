@@ -77,10 +77,10 @@ const UpdatePaymentStatusDialog = ({
   const [open, setOpen] = useState(false);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
+    values: {
       remarks: payment.remarks!,
-      interest_paid: 0,
-      capital_payment: 0,
+      interest_paid: payment.payment_date ? payment.interest_paid : 0,
+      capital_payment: payment.payment_date ? payment.capital_payment : 0,
       payment_mode: payment.payment_mode ?? "",
       payment_date: payment.payment_date ?? "",
     },
@@ -110,7 +110,7 @@ const UpdatePaymentStatusDialog = ({
       // If Interest is only Paid
       if (
         values.interest_paid == payment.interest_paid &&
-        values.capital_payment == 0
+        values.capital_payment != payment.capital_payment
       ) {
         await handleInterestPaid(payment);
       } else if (values.capital_payment > payment.capital_payment) {
@@ -223,6 +223,7 @@ const UpdatePaymentStatusDialog = ({
                   <FormItem>
                     <FormLabel>
                       <Checkbox
+                        defaultChecked={payment.interest_paid !== 0}
                         checked={field.value !== 0}
                         onCheckedChange={(checked) => {
                           if (checked) {

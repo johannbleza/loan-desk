@@ -104,7 +104,7 @@ const PaymentList = ({
                   </TableCell>
                 )}
                 <TableCell>
-                  {formatDate(payment.due_date, "MMM dd, yyyy")}
+                  {formatDate(payment.due_date, "MMM d, yyyy")}
                 </TableCell>
                 <TableCell>{formatToPeso(payment.principal_balance)}</TableCell>
                 <TableCell>{payment.loan?.interest_rate}%</TableCell>
@@ -129,7 +129,7 @@ const PaymentList = ({
                 )}
                 <TableCell>
                   {payment.payment_date &&
-                    format(payment.payment_date, "MMM dd, yyyy")}
+                    format(payment.payment_date, "MMM d, yyyy")}
                 </TableCell>
                 <TableCell>{payment.payment_mode}</TableCell>
                 <TableCell className="flex items-center justify-end text-right">
