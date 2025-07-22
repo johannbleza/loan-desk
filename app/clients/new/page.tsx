@@ -63,11 +63,11 @@ const AddClientPage = () => {
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      const agent = await addClient(values);
-      if (agent) {
+      const data = await addClient(values);
+      if (data) {
         toast.success("Client added successfully!", { position: "top-center" });
         form.reset();
-        router.push("/clients");
+        router.push(`/clients/${data.id}`);
         return;
       }
       toast.error("Error adding client!", { position: "top-center" });

@@ -3,13 +3,13 @@
 import { supabase } from "@/utils/supabase";
 import { Agent } from "../types/agent";
 
-export const addAgent = async (formData: Agent) => {
+export const addAgent = async (formData: Agent): Promise<Agent | undefined> => {
   const { data, error } = await supabase
     .from("agent")
     .insert(formData)
     .select();
   if (error) console.log(error);
-  if (data) return data;
+  if (data) return data[0];
 };
 
 export const getAgents = async () => {

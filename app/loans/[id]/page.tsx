@@ -97,7 +97,7 @@ const LoanPage = () => {
             <div className="flex gap-2 items-center">
               <h1 className="text-2xl font-semibold">Loan Details</h1>
             </div>
-            <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div>
                 <h2>Client:</h2>
                 <Link href={`/clients/${loan.client_id}`}>

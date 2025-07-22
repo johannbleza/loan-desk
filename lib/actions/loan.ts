@@ -4,13 +4,13 @@ import { supabase } from "@/utils/supabase";
 import { Loan } from "../types/loan";
 import { deletePaymentsByLoanId, generatePaymentSchedule } from "./payments";
 
-export const createLoan = async (formData: Loan) => {
+export const createLoan = async (formData: Loan): Promise<Loan | undefined> => {
   const { data, error } = await supabase.from("loan").insert(formData).select();
   if (error) console.log(error);
 
   if (data) {
     generatePaymentSchedule(data[0]);
-    return data;
+    return data[0];
   }
 };
 

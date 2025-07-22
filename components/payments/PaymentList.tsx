@@ -31,6 +31,7 @@ const PaymentList = ({
   showLoan,
 }: PaymentListProps) => {
   const collectedPayments = payments.filter((p) => p.remarks !== "Due");
+
   return (
     <Card>
       <CardHeader>

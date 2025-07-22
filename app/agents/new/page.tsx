@@ -38,11 +38,11 @@ const AddAgentPage = () => {
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      const agent = await addAgent(values);
-      if (agent) {
+      const data = await addAgent(values);
+      if (data) {
         toast.success("Agent added successfully!", { position: "top-center" });
         form.reset();
-        router.push("/agents");
+        router.push(`/agents/${data.id}`);
         return;
       }
       toast.error("Error adding agent!", { position: "top-center" });

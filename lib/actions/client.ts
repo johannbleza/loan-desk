@@ -3,13 +3,15 @@
 import { supabase } from "@/utils/supabase";
 import { Client } from "../types/client";
 
-export const addClient = async (formData: Client) => {
+export const addClient = async (
+  formData: Client,
+): Promise<Client | undefined> => {
   const { data, error } = await supabase
     .from("client")
     .insert(formData)
     .select();
   if (error) console.log(error);
-  if (data) return data;
+  if (data) return data[0];
 };
 
 export const getClients = async (agent_id?: string) => {

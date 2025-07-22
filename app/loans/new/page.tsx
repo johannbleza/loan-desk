@@ -92,7 +92,7 @@ const AddLoanPage = () => {
       if (data) {
         toast.success("Loan created successfully!", { position: "top-center" });
         form.reset();
-        router.push("/loans");
+        router.push(`/loans/${data.id}`);
         return;
       }
       toast.error("Error creating loan!", { position: "top-center" });
@@ -235,6 +235,7 @@ const AddLoanPage = () => {
                       <FormControl>
                         <Input
                           type="number"
+                          placeholder="Optional"
                           {...field}
                           value={field.value === 0 ? "" : field.value}
                           onChange={(e) =>
