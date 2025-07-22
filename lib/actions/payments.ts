@@ -4,7 +4,7 @@ import { supabase } from "@/utils/supabase";
 import { Loan } from "../types/loan";
 import { pmt } from "../utils";
 import { Payment } from "../types/payment";
-import { addMonths } from "date-fns";
+import { addMonths, endOfMonth, startOfMonth } from "date-fns";
 
 export const generatePaymentSchedule = async (loan: Loan) => {
   const payments = [];
@@ -50,7 +50,7 @@ export const getPayments = async (loan_id?: string) => {
       .select(
         `
       *,
-      loan:loan_id (
+      loan(
         *,
         client:client_id (name),
         agent:agent_id (name)
@@ -63,6 +63,36 @@ export const getPayments = async (loan_id?: string) => {
       query = query.eq("loan_id", loan_id);
     }
     const { data, error } = await query;
+
+    if (error) {
+      console.error("Error fetching payments:", error);
+      throw error;
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Failed to get payments:", error);
+    throw error;
+  }
+};
+
+export const getPaymentsByMonthYear = async (date: Date) => {
+  try {
+    const { data, error } = await supabase
+      .from("payment")
+      .select(
+        `
+      *,
+      loan(
+        *,
+        client:client_id (name),
+        agent:agent_id (name)
+      )
+    `,
+      )
+      .gte("due_date", startOfMonth(date).toLocaleString())
+      .lte("due_date", endOfMonth(date).toLocaleString())
+      .order("due_date", { ascending: true });
 
     if (error) {
       console.error("Error fetching payments:", error);

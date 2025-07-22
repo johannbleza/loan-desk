@@ -14,34 +14,49 @@ import { formatToPeso } from "@/lib/utils";
 import UpdatePaymentStatusDialog from "./UpdatePaymentStatusDialog";
 
 interface PaymentListProps {
+  title?: string;
   payments: Payment[];
   onAction: () => void;
   showAll?: boolean;
   showClient?: boolean;
   showAgent?: boolean;
   showLoan?: boolean;
+  showTerm?: boolean;
+  showIndex?: boolean;
+  showTotal?: boolean;
+  showCollected?: boolean;
+  monthPicker?: React.ReactNode;
 }
 
 const PaymentList = ({
+  title,
   payments,
   onAction,
   showAll,
   showAgent,
   showClient,
   showLoan,
+  showTerm,
+  showIndex,
+  showTotal,
+  showCollected,
+  monthPicker,
 }: PaymentListProps) => {
   const collectedPayments = payments.filter((p) => p.remarks !== "Due");
+  console.log(payments);
 
   return (
     <Card>
       <CardHeader>
-        <h1 className="text-2xl font-semibold">Payment Schedule</h1>
+        {monthPicker}
+        <h1 className="text-2xl font-semibold">{title}</h1>
       </CardHeader>
       <CardContent>
         <Table>
           <TableHeader>
             <TableRow className="text-center">
-              <TableHead className="w-8">Term</TableHead>
+              {showIndex && <TableHead className="w-8"></TableHead>}
+              {showTerm && <TableHead className="w-8">Term</TableHead>}
               {(showAll || showLoan) && <TableHead>Loan ID</TableHead>}
               {(showAll || showClient) && <TableHead>Client</TableHead>}
               <TableHead>Due Date</TableHead>
@@ -56,15 +71,18 @@ const PaymentList = ({
               <TableHead className="text-right">Remarks</TableHead>
             </TableRow>
           </TableHeader>
-          <TableBody className="text-center">
-            {payments.map((payment) => (
+          <TableBody>
+            {payments.map((payment, index) => (
               <TableRow
                 key={payment.id}
                 className={
                   payment.remarks != "Due" ? "font-semibold" : "text-zinc-500"
                 }
               >
-                <TableCell className="w-4">{payment.term}</TableCell>
+                {showTerm && (
+                  <TableCell className="w-4">{payment.term}</TableCell>
+                )}
+                {showIndex && <TableCell>{index + 1}</TableCell>}
                 {(showAll || showLoan) && (
                   <TableCell>
                     <Link
@@ -122,65 +140,70 @@ const PaymentList = ({
                 </TableCell>
               </TableRow>
             ))}
-            {/* Total */}
-            <TableRow className="font-semibold">
-              <TableCell></TableCell>
-              <TableCell></TableCell>
-              <TableCell></TableCell>
-              <TableCell className="text-start">Total:</TableCell>
-              <TableCell>
-                {formatToPeso(
-                  payments.reduce(
-                    (sum, p) => sum + (p.monthly_payment ?? 0),
-                    0,
-                  ),
-                )}
-              </TableCell>
-              <TableCell>
-                {formatToPeso(
-                  payments.reduce((sum, p) => sum + (p.interest_paid ?? 0), 0),
-                )}
-              </TableCell>
-              <TableCell>
-                {formatToPeso(
-                  payments.reduce(
-                    (sum, p) => sum + (p.capital_payment ?? 0),
-                    0,
-                  ),
-                )}
-              </TableCell>
-            </TableRow>
-            {/* Collected Total */}
-            <TableRow>
-              <TableCell></TableCell>
-              <TableCell></TableCell>
-              <TableCell></TableCell>
-              <TableCell className="text-start">Collected:</TableCell>
-              <TableCell>
-                {formatToPeso(
-                  collectedPayments.reduce(
-                    (sum, p) => sum + (p.monthly_payment ?? 0),
-                    0,
-                  ),
-                )}
-              </TableCell>
-              <TableCell>
-                {formatToPeso(
-                  collectedPayments.reduce(
-                    (sum, p) => sum + (p.interest_paid ?? 0),
-                    0,
-                  ),
-                )}
-              </TableCell>
-              <TableCell>
-                {formatToPeso(
-                  collectedPayments.reduce(
-                    (sum, p) => sum + (p.capital_payment ?? 0),
-                    0,
-                  ),
-                )}
-              </TableCell>
-            </TableRow>
+            {showTotal && (
+              <TableRow className="font-semibold">
+                <TableCell></TableCell>
+                <TableCell></TableCell>
+                <TableCell></TableCell>
+                <TableCell className="text-start">Total:</TableCell>
+                <TableCell>
+                  {formatToPeso(
+                    payments.reduce(
+                      (sum, p) => sum + (p.monthly_payment ?? 0),
+                      0,
+                    ),
+                  )}
+                </TableCell>
+                <TableCell>
+                  {formatToPeso(
+                    payments.reduce(
+                      (sum, p) => sum + (p.interest_paid ?? 0),
+                      0,
+                    ),
+                  )}
+                </TableCell>
+                <TableCell>
+                  {formatToPeso(
+                    payments.reduce(
+                      (sum, p) => sum + (p.capital_payment ?? 0),
+                      0,
+                    ),
+                  )}
+                </TableCell>
+              </TableRow>
+            )}
+            {showCollected && (
+              <TableRow>
+                <TableCell></TableCell>
+                <TableCell></TableCell>
+                <TableCell></TableCell>
+                <TableCell className="text-start">Collected:</TableCell>
+                <TableCell>
+                  {formatToPeso(
+                    collectedPayments.reduce(
+                      (sum, p) => sum + (p.monthly_payment ?? 0),
+                      0,
+                    ),
+                  )}
+                </TableCell>
+                <TableCell>
+                  {formatToPeso(
+                    collectedPayments.reduce(
+                      (sum, p) => sum + (p.interest_paid ?? 0),
+                      0,
+                    ),
+                  )}
+                </TableCell>
+                <TableCell>
+                  {formatToPeso(
+                    collectedPayments.reduce(
+                      (sum, p) => sum + (p.capital_payment ?? 0),
+                      0,
+                    ),
+                  )}
+                </TableCell>
+              </TableRow>
+            )}
           </TableBody>
         </Table>
       </CardContent>

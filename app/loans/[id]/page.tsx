@@ -152,11 +152,15 @@ const LoanPage = () => {
           </CardContent>
         </Card>
         <PaymentList
+          title="Payment Schedule"
+          showTerm={true}
           payments={payments}
           onAction={() => {
             fetchLoan();
             fetchPayments();
           }}
+          showTotal={true}
+          showCollected={true}
         />
       </main>
     );

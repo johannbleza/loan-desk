@@ -28,6 +28,7 @@ import LoanDatePicker from "./LoanDatePicker";
 import AgentSelect from "../agents/AgentSelect";
 import ClientSelect from "../clients/ClientSelect";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 const formSchema = z.object({
   agent_id: z.string().min(1, {
@@ -59,6 +60,7 @@ interface AddLoanDialogProps {
 }
 
 const AddLoanDialog = ({ onAdd, client_id, agent_id }: AddLoanDialogProps) => {
+  const router = useRouter();
   const [selectedAgentId, setSelectedAgentId] = useState(agent_id);
   const [open, setOpen] = useState(false);
   const form = useForm<z.infer<typeof formSchema>>({
@@ -80,8 +82,8 @@ const AddLoanDialog = ({ onAdd, client_id, agent_id }: AddLoanDialogProps) => {
       if (data) {
         setOpen(false);
         toast.success("Loan created successfully!", { position: "top-center" });
-        form.reset();
         onAdd();
+        router.push(`/loans/${data.id}`);
         return;
       }
       toast.error("Error creating loan!", { position: "top-center" });
