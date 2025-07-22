@@ -12,21 +12,11 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { getAgents } from "@/lib/actions/agents";
-import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Agent } from "@/lib/types/agent";
 import { addClient } from "@/lib/actions/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
-import AddAgentDialog from "@/components/agents/AddAgentDialog";
+import AgentSelect from "@/components/agents/AgentSelect";
 
 const formSchema = z.object({
   agent_id: z.string().min(1, {
@@ -41,15 +31,6 @@ const formSchema = z.object({
 
 const AddClientPage = () => {
   const router = useRouter();
-  const [agents, setAgents] = useState<Agent[]>([]);
-
-  const fetchAgents = async () => {
-    setAgents((await getAgents()) ?? []);
-  };
-
-  useEffect(() => {
-    fetchAgents();
-  }, []);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -93,22 +74,8 @@ const AddClientPage = () => {
                 render={({ field }) => (
                   <FormItem className="mb-5">
                     <FormLabel>Assigned Agent *</FormLabel>
-                    <Select onValueChange={field.onChange}>
-                      <FormControl>
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Select an agent" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {agents.map(({ id, name }) => (
-                          <SelectItem key={id} value={id!}>
-                            {name}
-                          </SelectItem>
-                        ))}
+                    <AgentSelect onValueChange={field.onChange} />
 
-                        <AddAgentDialog onAdd={fetchAgents} />
-                      </SelectContent>
-                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}

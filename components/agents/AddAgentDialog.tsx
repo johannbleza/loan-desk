@@ -25,6 +25,7 @@ import { DialogClose } from "@radix-ui/react-dialog";
 import { addAgent } from "@/lib/actions/agents";
 import { useState } from "react";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 const formSchema = z.object({
   name: z.string().min(2, {
@@ -40,6 +41,7 @@ interface AddAgentDialogProps {
 }
 
 const AddAgentDialog = ({ onAdd, isButton }: AddAgentDialogProps) => {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -52,11 +54,11 @@ const AddAgentDialog = ({ onAdd, isButton }: AddAgentDialogProps) => {
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      const agent = await addAgent(values);
-      if (agent) {
+      const data = await addAgent(values);
+      if (data) {
         setOpen(false);
         toast.success("Agent added successfully!", { position: "top-center" });
-        form.reset();
+        router.push(`agents/${data.id}`);
         onAdd();
         return;
       }
@@ -69,7 +71,7 @@ const AddAgentDialog = ({ onAdd, isButton }: AddAgentDialogProps) => {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         {isButton ? (
-          <Button className="cursor-pointer">
+          <Button className="cursor-pointer" onClick={() => form.reset()}>
             <Plus />
             <span>Add Agent</span>
           </Button>

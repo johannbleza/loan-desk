@@ -70,7 +70,7 @@ const DeleteLoanDialog = ({
             <span className="font-bold text-black">
               L-{loan.id?.slice(-4).toUpperCase()}
             </span>
-            This action cannot be undone and will permanently remove all
+            ? This action cannot be undone and will permanently remove all
             associated data.
           </DialogDescription>
           <div className="flex gap-3 mt-2">

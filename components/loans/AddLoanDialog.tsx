@@ -22,21 +22,12 @@ import {
 import { Button } from "../ui/button";
 import { Plus } from "lucide-react";
 import { DialogClose } from "@radix-ui/react-dialog";
-import { getAgents } from "@/lib/actions/agents";
-import { useEffect, useState } from "react";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Agent } from "@/lib/types/agent";
-import { getClients } from "@/lib/actions/client";
-import { Client } from "@/lib/types/client";
 import { createLoan } from "@/lib/actions/loan";
 import { toast } from "sonner";
 import LoanDatePicker from "./LoanDatePicker";
+import AgentSelect from "../agents/AgentSelect";
+import ClientSelect from "../clients/ClientSelect";
+import { useState } from "react";
 
 const formSchema = z.object({
   agent_id: z.string().min(1, {
@@ -67,31 +58,8 @@ interface AddLoanDialogProps {
   client_name?: string;
 }
 
-const AddLoanDialog = ({
-  onAdd,
-  client_id,
-  agent_id,
-  client_name,
-}: AddLoanDialogProps) => {
-  const [agents, setAgents] = useState<Agent[]>([]);
-  const [clients, setClients] = useState<Client[]>([]);
-  const [selectedAgentId, setSelectedAgentId] = useState<string | undefined>();
-
-  const fetchAgents = async () => {
-    setAgents((await getAgents()) ?? []);
-  };
-
-  useEffect(() => {
-    fetchAgents();
-  }, []);
-
-  useEffect(() => {
-    const fetchClients = async () => {
-      setClients((await getClients(selectedAgentId)) ?? []);
-    };
-    fetchClients();
-  }, [selectedAgentId, client_name]);
-
+const AddLoanDialog = ({ onAdd, client_id, agent_id }: AddLoanDialogProps) => {
+  const [selectedAgentId, setSelectedAgentId] = useState(agent_id);
   const [open, setOpen] = useState(false);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -127,7 +95,7 @@ const AddLoanDialog = ({
         <Button
           className="cursor-pointer"
           onClick={() => {
-            setSelectedAgentId(agent_id ?? "");
+            setSelectedAgentId(agent_id);
             form.reset();
           }}
         >
@@ -151,26 +119,13 @@ const AddLoanDialog = ({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Assigned Agent</FormLabel>
-                    <Select
+                    <AgentSelect
+                      defaultAgentId={agent_id}
                       onValueChange={(value) => {
                         field.onChange(value);
                         setSelectedAgentId(value);
                       }}
-                      defaultValue={agent_id}
-                    >
-                      <FormControl>
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Select an agent" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {agents.map(({ id, name }) => (
-                          <SelectItem key={id} value={id!}>
-                            {name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    />
                     <FormMessage />
                   </FormItem>
                 )}
@@ -181,23 +136,11 @@ const AddLoanDialog = ({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Client</FormLabel>
-                    <Select
+                    <ClientSelect
+                      agent_id={selectedAgentId}
+                      defaultClientId={client_id}
                       onValueChange={field.onChange}
-                      defaultValue={client_id}
-                    >
-                      <FormControl>
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Select a client" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {clients.map(({ id, name }) => (
-                          <SelectItem key={id} value={id!}>
-                            {name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    />
                     <FormMessage />
                   </FormItem>
                 )}
@@ -266,6 +209,7 @@ const AddLoanDialog = ({
                     <FormLabel>Agent Share (%)</FormLabel>
                     <FormControl>
                       <Input
+                        placeholder="Optional"
                         type="number"
                         {...field}
                         value={field.value === 0 ? "" : field.value}
@@ -292,7 +236,11 @@ const AddLoanDialog = ({
               />
             </div>
             <div className="flex gap-3">
-              <Button type="submit" className="cursor-pointer">
+              <Button
+                type="submit"
+                className="cursor-pointer"
+                disabled={form.formState.isSubmitting}
+              >
                 Create Loan
               </Button>
               <DialogClose asChild>

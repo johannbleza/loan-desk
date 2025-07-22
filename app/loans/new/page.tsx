@@ -12,23 +12,14 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { getAgents } from "@/lib/actions/agents";
-import { useEffect, useState } from "react";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Agent } from "@/lib/types/agent";
-import { getClients } from "@/lib/actions/client";
-import { Client } from "@/lib/types/client";
+import { useState } from "react";
 import { createLoan } from "@/lib/actions/loan";
 import { toast } from "sonner";
 import LoanDatePicker from "@/components/loans/LoanDatePicker";
 import { Card, CardContent } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
+import AgentSelect from "@/components/agents/AgentSelect";
+import ClientSelect from "@/components/clients/ClientSelect";
 
 const formSchema = z.object({
   agent_id: z.string().min(1, {
@@ -40,9 +31,12 @@ const formSchema = z.object({
   loan_amount: z.number().min(1, {
     message: "Loan Amount is required.",
   }),
-  term: z.number().min(1, {
-    message: "Term is required.",
-  }),
+  term: z
+    .number()
+    .min(1, {
+      message: "Term is required.",
+    })
+    .max(99, { message: "Max limit exceeded." }),
   interest_rate: z.number().min(1, {
     message: "Interest Rate is required.",
   }),
@@ -54,24 +48,7 @@ const formSchema = z.object({
 
 const AddLoanPage = () => {
   const router = useRouter();
-  const [agents, setAgents] = useState<Agent[]>([]);
-  const [clients, setClients] = useState<Client[]>([]);
-  const [selectedAgentId, setSelectedAgentId] = useState<string | undefined>();
-
-  const fetchAgents = async () => {
-    setAgents((await getAgents()) ?? []);
-  };
-
-  useEffect(() => {
-    fetchAgents();
-  }, []);
-
-  useEffect(() => {
-    const fetchClients = async () => {
-      setClients((await getClients(selectedAgentId)) ?? []);
-    };
-    fetchClients();
-  }, [selectedAgentId]);
+  const [selectedAgentId, setSelectedAgentId] = useState("");
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -119,25 +96,12 @@ const AddLoanPage = () => {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Assigned Agent</FormLabel>
-                      <Select
+                      <AgentSelect
                         onValueChange={(value) => {
                           field.onChange(value);
                           setSelectedAgentId(value);
                         }}
-                      >
-                        <FormControl>
-                          <SelectTrigger className="w-full">
-                            <SelectValue placeholder="Select an agent" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {agents.map(({ id, name }) => (
-                            <SelectItem key={id} value={id!}>
-                              {name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      />
                       <FormMessage />
                     </FormItem>
                   )}
@@ -148,20 +112,10 @@ const AddLoanPage = () => {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Client</FormLabel>
-                      <Select onValueChange={field.onChange}>
-                        <FormControl>
-                          <SelectTrigger className="w-full">
-                            <SelectValue placeholder="Select a client" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {clients.map(({ id, name }) => (
-                            <SelectItem key={id} value={id!}>
-                              {name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      <ClientSelect
+                        agent_id={selectedAgentId}
+                        onValueChange={field.onChange}
+                      />
                       <FormMessage />
                     </FormItem>
                   )}
@@ -263,7 +217,11 @@ const AddLoanPage = () => {
                 />
               </div>
               <div className="flex gap-3">
-                <Button type="submit" className="cursor-pointer">
+                <Button
+                  type="submit"
+                  className="cursor-pointer"
+                  disabled={form.formState.isSubmitting}
+                >
                   Create Loan
                 </Button>
                 <Button

@@ -22,18 +22,11 @@ import {
 import { Button } from "../ui/button";
 import { Plus } from "lucide-react";
 import { DialogClose } from "@radix-ui/react-dialog";
-import { getAgents } from "@/lib/actions/agents";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Agent } from "@/lib/types/agent";
 import { addClient } from "@/lib/actions/client";
+import AgentSelect from "../agents/AgentSelect";
+import { useRouter } from "next/navigation";
 
 const formSchema = z.object({
   agent_id: z.string().min(1, {
@@ -52,20 +45,8 @@ interface AddClientDialogProps {
   agent_name?: string;
 }
 
-const AddClientDialog = ({
-  onAdd,
-  agent_id,
-  agent_name,
-}: AddClientDialogProps) => {
-  const [agents, setAgents] = useState<Agent[]>([]);
-
-  const fetchAgents = async () => {
-    setAgents((await getAgents()) ?? []);
-  };
-
-  useEffect(() => {
-    fetchAgents();
-  }, [agent_name]);
+const AddClientDialog = ({ onAdd, agent_id }: AddClientDialogProps) => {
+  const router = useRouter();
 
   const [open, setOpen] = useState(false);
   const form = useForm<z.infer<typeof formSchema>>({
@@ -80,11 +61,11 @@ const AddClientDialog = ({
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      const agent = await addClient(values);
-      if (agent) {
+      const data = await addClient(values);
+      if (data) {
         setOpen(false);
         toast.success("Client added successfully!", { position: "top-center" });
-        form.reset();
+        router.push(`/clients/${data.id}`);
         onAdd();
         return;
       }
@@ -116,23 +97,10 @@ const AddClientDialog = ({
               render={({ field }) => (
                 <FormItem className="mb-5">
                   <FormLabel>Assigned Agent *</FormLabel>
-                  <Select
+                  <AgentSelect
+                    defaultAgentId={agent_id}
                     onValueChange={field.onChange}
-                    defaultValue={agent_id}
-                  >
-                    <FormControl>
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Select an agent" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {agents.map(({ id, name }) => (
-                        <SelectItem key={id} value={id!}>
-                          {name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  />
                   <FormMessage />
                 </FormItem>
               )}
