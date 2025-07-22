@@ -203,6 +203,8 @@ const AddLoanDialog = ({ onAdd, client_id, agent_id }: AddLoanDialogProps) => {
                   </FormItem>
                 )}
               />
+            </div>
+            <div className="grid grid-cols-2 gap-4 items-start">
               <FormField
                 control={form.control}
                 name="agent_share"
@@ -230,7 +232,7 @@ const AddLoanDialog = ({ onAdd, client_id, agent_id }: AddLoanDialogProps) => {
                     <FormLabel>Loan Date</FormLabel>
                     <LoanDatePicker
                       onChange={field.onChange}
-                      value={field.value}
+                      defaultValue={field.value}
                     />
                     <FormMessage />
                   </FormItem>

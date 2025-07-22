@@ -158,6 +158,8 @@ const EditLoanDialog = ({ onEdit, loan, isButton }: EditLoanDialogProps) => {
                   </FormItem>
                 )}
               />
+            </div>
+            <div className="grid grid-cols-2 items-start gap-4">
               <FormField
                 control={form.control}
                 name="agent_share"
@@ -184,7 +186,7 @@ const EditLoanDialog = ({ onEdit, loan, isButton }: EditLoanDialogProps) => {
                     <FormLabel>Loan Date</FormLabel>
                     <LoanDatePicker
                       onChange={field.onChange}
-                      value={field.value}
+                      defaultValue={field.value}
                     />
                     <FormMessage />
                   </FormItem>

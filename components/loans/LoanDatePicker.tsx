@@ -1,47 +1,106 @@
 "use client";
-import { Button } from "../ui/button";
-import { ChevronDownIcon } from "lucide-react";
+
+import * as React from "react";
+import { parseDate } from "chrono-node";
+import { CalendarIcon } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
+import { Input } from "@/components/ui/input";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { useState } from "react";
 
-interface LoanDatePickerProps {
-  value: string;
-  onChange: (date: string) => void;
+function formatDate(date: Date | undefined) {
+  if (!date) {
+    return "";
+  }
+
+  return date.toLocaleDateString("en-US", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+  });
 }
 
-const LoanDatePicker = ({ value, onChange }: LoanDatePickerProps) => {
-  const [open, setOpen] = useState(false);
+interface LoanDatePickerProps {
+  defaultValue: string;
+  onChange: (date: string | undefined) => void;
+}
+
+export function LoanDatePicker({
+  defaultValue,
+  onChange,
+}: LoanDatePickerProps) {
+  const [open, setOpen] = React.useState(false);
+  const [value, setValue] = React.useState(defaultValue);
+  const [date, setDate] = React.useState<Date | undefined>(
+    parseDate(value) || undefined,
+  );
+  const [month, setMonth] = React.useState<Date | undefined>(date);
+
+  React.useEffect(() => {
+    if (date) onChange(date.toLocaleString());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [date]);
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <Button
-          variant="outline"
+    <div className="flex flex-col gap-3">
+      <div className="relative flex gap-2">
+        <Input
           id="date"
-          className="justify-between font-normal"
-        >
-          {value ? new Date(value).toLocaleDateString() : "Select date"}
-          <ChevronDownIcon />
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-auto overflow-hidden p-0" align="start">
-        <Calendar
-          mode="single"
-          selected={value ? new Date(value) : undefined}
-          captionLayout="dropdown"
-          onSelect={(date) => {
-            onChange(date ? date.toLocaleDateString() : "");
-            setOpen(false);
+          value={value}
+          placeholder="mm/dd/yyy"
+          className="bg-background pr-10"
+          onChange={(e) => {
+            setValue(e.target.value);
+            const date = parseDate(e.target.value);
+            if (date) {
+              setDate(date);
+              setMonth(date);
+            }
+          }}
+          onKeyDown={(e) => {
+            if (e.key === "ArrowDown") {
+              e.preventDefault();
+              setOpen(true);
+            }
           }}
         />
-      </PopoverContent>
-    </Popover>
+        <Popover open={open} onOpenChange={setOpen}>
+          <PopoverTrigger asChild>
+            <Button
+              id="date-picker"
+              variant="ghost"
+              className="absolute top-1/2 right-2 size-6 -translate-y-1/2"
+            >
+              <CalendarIcon className="size-3.5" />
+              <span className="sr-only">Select date</span>
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto overflow-hidden p-0" align="end">
+            <Calendar
+              mode="single"
+              selected={date}
+              captionLayout="dropdown"
+              month={month}
+              onMonthChange={setMonth}
+              onSelect={(date) => {
+                setDate(date);
+                setValue(formatDate(date));
+                setOpen(false);
+              }}
+            />
+          </PopoverContent>
+        </Popover>
+      </div>
+      <div className="text-muted-foreground px-1 text-sm">
+        {formatDate(date)}
+      </div>
+    </div>
   );
-};
+}
 
 export default LoanDatePicker;

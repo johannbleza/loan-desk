@@ -349,7 +349,7 @@ const UpdatePaymentStatusDialog = ({
                   <FormLabel>Payment Date</FormLabel>
                   <LoanDatePicker
                     onChange={field.onChange}
-                    value={field.value ?? ""}
+                    defaultValue={field.value ?? ""}
                   />
                   <FormMessage />
                 </FormItem>

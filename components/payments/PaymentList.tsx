@@ -43,7 +43,6 @@ const PaymentList = ({
   monthPicker,
 }: PaymentListProps) => {
   const collectedPayments = payments.filter((p) => p.remarks !== "Due");
-  console.log(payments);
 
   return (
     <Card>
@@ -104,7 +103,7 @@ const PaymentList = ({
                   </TableCell>
                 )}
                 <TableCell>
-                  {formatDate(payment.due_date, "MMM d, yyyy")}
+                  {formatDate(payment.due_date, "MMM dd, yyyy")}
                 </TableCell>
                 <TableCell>{formatToPeso(payment.principal_balance)}</TableCell>
                 <TableCell>{payment.loan?.interest_rate}%</TableCell>
@@ -129,7 +128,7 @@ const PaymentList = ({
                 )}
                 <TableCell>
                   {payment.payment_date &&
-                    format(payment.payment_date, "MMM d, yyyy")}
+                    format(payment.payment_date, "MMM dd, yyyy")}
                 </TableCell>
                 <TableCell>{payment.payment_mode}</TableCell>
                 <TableCell className="flex items-center justify-end text-right">
