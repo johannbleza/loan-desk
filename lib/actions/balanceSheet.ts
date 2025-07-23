@@ -1,12 +1,9 @@
 "use server";
 
 import { supabase } from "@/utils/supabase";
-import { Agent } from "../types/agent";
-import { BalanceSheet } from "../types/balanceSheet";
+import { Entry } from "../types/entry";
 
-export const addBalanceSheet = async (
-  formData: BalanceSheet,
-): Promise<BalanceSheet | undefined> => {
+export const addEntry = async (formData: Entry): Promise<Entry | undefined> => {
   const { data, error } = await supabase
     .from("balance_sheet")
     .insert(formData)
@@ -15,7 +12,7 @@ export const addBalanceSheet = async (
   if (data) return data[0];
 };
 
-export const getBalanceSheet = async () => {
+export const getEntries = async () => {
   const { data, error } = await supabase
     .from("balance_sheet")
     .select()
@@ -26,30 +23,21 @@ export const getBalanceSheet = async () => {
   if (data) return data;
 };
 
-export const getAgent = async (agent_id: string) => {
+export const editEntry = async (entry: Entry) => {
   const { data, error } = await supabase
-    .from("agent")
-    .select()
-    .eq("id", agent_id);
-  if (error) console.log(error);
-  if (data) return data[0];
-};
-
-export const editAgent = async (agent: Agent) => {
-  const { data, error } = await supabase
-    .from("agent")
-    .update(agent)
-    .eq("id", agent.id)
+    .from("balance_sheet")
+    .update(entry)
+    .eq("id", entry.id)
     .select();
   if (error) console.log(error);
   if (data) return data;
 };
 
-export const deleteAgent = async (agent: Agent) => {
+export const deleteEntry = async (entry: Entry) => {
   const { data, error } = await supabase
-    .from("agent")
+    .from("balance_sheet")
     .delete()
-    .eq("id", agent.id)
+    .eq("id", entry.id)
     .select();
   if (error) console.log(error);
   if (data) return data;

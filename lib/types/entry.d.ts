@@ -1,4 +1,4 @@
-export interface BalanceSheet {
+export interface Entry {
   id?: string;
   entry_date: string;
   balance_in: number;

@@ -20,12 +20,13 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "../ui/button";
-import { Plus } from "lucide-react";
+import { Edit } from "lucide-react";
 import { DialogClose } from "@radix-ui/react-dialog";
 import { useState } from "react";
 import { toast } from "sonner";
 import LoanDatePicker from "../loans/LoanDatePicker";
-import { addBalanceSheet } from "@/lib/actions/balanceSheet";
+import { editEntry } from "@/lib/actions/balanceSheet";
+import { Entry } from "@/lib/types/entry";
 
 const formSchema = z.object({
   entry_date: z.string().min(1, { message: "Loan Date is required." }),
@@ -34,62 +35,58 @@ const formSchema = z.object({
   remarks: z.string(),
 });
 
-interface AddBalanceSheetDialogProps {
+interface EditEntryDialogProps {
+  entry: Entry;
   onAdd: () => void;
   isButton?: boolean;
 }
 
-const AddBalanceSheetDialog = ({
-  onAdd,
-  isButton,
-}: AddBalanceSheetDialogProps) => {
-  const date = new Date();
-  const today = date.toLocaleDateString();
+const EditEntryDialog = ({ entry, onAdd, isButton }: EditEntryDialogProps) => {
   const [open, setOpen] = useState(false);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      entry_date: today,
-      balance_in: 0,
-      balance_out: 0,
-      remarks: "",
+    values: {
+      entry_date: entry.entry_date,
+      balance_in: entry.balance_in,
+      balance_out: entry.balance_out,
+      remarks: entry.remarks ?? "",
     },
   });
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      const data = await addBalanceSheet(values);
+      const data = await editEntry({ ...values, id: entry.id });
       if (data) {
         setOpen(false);
-        toast.success("Entry added successfully!", { position: "top-center" });
+        toast.success("Entry updated successfully!", {
+          position: "top-center",
+        });
         onAdd();
         return;
       }
-      toast.error("Error adding entry!", { position: "top-center" });
+      toast.error("Error updating entry!", { position: "top-center" });
     } catch (error) {
       console.log(error);
-      toast.error(`Error adding entry! ${error}`, { position: "top-center" });
+      toast.error(`Error updating entry! ${error}`, { position: "top-center" });
     }
   };
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        {isButton ? (
-          <Button className="cursor-pointer" onClick={() => form.reset()}>
-            <Plus />
-            <span>New Entry</span>
+      {isButton ? (
+        <DialogTrigger className="cursor-pointer" asChild>
+          <Button variant="outline" onClick={() => form.reset()}>
+            <Edit />
+            <span>Edit</span>
           </Button>
-        ) : (
-          <div className="cursor-pointer p-2 text-sm hover:bg-zinc-100 rounded-lg">
-            New Agent
-          </div>
-        )}
-      </DialogTrigger>
+        </DialogTrigger>
+      ) : (
+        <DialogTrigger className="cursor-pointer">Edit</DialogTrigger>
+      )}
       <DialogContent className="text-start">
         <DialogHeader className="text-start">
-          <DialogTitle className="text-2xl">Add New Entry</DialogTitle>
+          <DialogTitle className="text-2xl">Update Entry</DialogTitle>
           <DialogDescription>
-            Please provide the necessary details to add a new entry.
+            Please provide the necessary details to update an entry.
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -161,7 +158,7 @@ const AddBalanceSheetDialog = ({
             />
             <div className="flex gap-3">
               <Button type="submit" className="cursor-pointer">
-                Add Entry
+                Save Changes
               </Button>
               <DialogClose asChild>
                 <Button variant="outline" className="cursor-pointer">
@@ -176,4 +173,4 @@ const AddBalanceSheetDialog = ({
   );
 };
 
-export default AddBalanceSheetDialog;
+export default EditEntryDialog;

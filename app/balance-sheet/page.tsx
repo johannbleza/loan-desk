@@ -8,17 +8,17 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { useEffect, useState } from "react";
-import AddBalanceSheetDialog from "@/components/balance-sheet/AddBalanceSheet";
+import AddEntryDialog from "@/components/balance-sheet/AddEntryDialog";
 import BalanceSheetList from "@/components/balance-sheet/BalanceSheetList";
-import { BalanceSheet } from "@/lib/types/balanceSheet";
-import { getBalanceSheet } from "@/lib/actions/balanceSheet";
+import { Entry } from "@/lib/types/entry";
+import { getEntries } from "@/lib/actions/balanceSheet";
 
 const Page = () => {
-  const [balanceSheet, setBalanceSheet] = useState<BalanceSheet[]>([]);
+  const [balanceSheet, setBalanceSheet] = useState<Entry[]>([]);
 
   const fetchBalanceSheet = async () => {
     try {
-      setBalanceSheet((await getBalanceSheet()) ?? []);
+      setBalanceSheet((await getEntries()) ?? []);
     } catch (error) {
       console.log(error);
     }
@@ -45,7 +45,7 @@ const Page = () => {
           </Breadcrumb>
           <h1 className="text-4xl font-bold">Balance Sheet</h1>
         </div>
-        <AddBalanceSheetDialog onAdd={fetchBalanceSheet} isButton={true} />
+        <AddEntryDialog onAdd={fetchBalanceSheet} isButton={true} />
       </div>
       <BalanceSheetList
         balanceSheet={balanceSheet}

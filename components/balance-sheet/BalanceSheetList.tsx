@@ -7,13 +7,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import AgentActionsDropdown from "../agents/AgentActionsDropdown";
-import Link from "next/link";
-import { BalanceSheet } from "@/lib/types/balanceSheet";
+import { Entry } from "@/lib/types/entry";
 import { format } from "date-fns";
+import { formatToPeso } from "@/lib/utils";
+import BalanceSheetActionsDropdown from "./EntryActionsDropdown";
 
 interface BalanceSheetListProps {
-  balanceSheet: BalanceSheet[];
+  balanceSheet: Entry[];
   onAction: () => void;
 }
 
@@ -48,12 +48,17 @@ const BalanceSheetList = ({
                 <TableCell>
                   {format(entry.entry_date, "MMM dd, yyyy")}
                 </TableCell>
-                <TableCell>{entry.balance_in}</TableCell>
-                <TableCell>{entry.balance_out}</TableCell>
-                <TableCell>{entry.balance_in - entry.balance_out}</TableCell>
+                <TableCell>{formatToPeso(entry.balance_in)}</TableCell>
+                <TableCell>{formatToPeso(entry.balance_out)}</TableCell>
+                <TableCell>
+                  {formatToPeso(entry.balance_in - entry.balance_out)}
+                </TableCell>
                 <TableCell>{entry.remarks}</TableCell>
                 <TableCell className="flex items-center justify-end text-right">
-                  {/* <AgentActionsDropdown agent={entry} onAction={onAction} /> */}
+                  <BalanceSheetActionsDropdown
+                    entry={entry}
+                    onAction={onAction}
+                  />
                 </TableCell>
               </TableRow>
             ))}
