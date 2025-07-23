@@ -15,15 +15,10 @@ export const addBalanceSheet = async (
   if (data) return data[0];
 };
 
-export const getAgents = async () => {
+export const getBalanceSheet = async () => {
   const { data, error } = await supabase
-    .from("agent")
-    .select(
-      `
-      *,
-      client(count)
-    `,
-    )
+    .from("balance_sheet")
+    .select()
     .order("created_at", { ascending: true });
 
   if (error) console.log(error);

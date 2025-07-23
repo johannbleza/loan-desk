@@ -8,24 +8,24 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { useEffect, useState } from "react";
-import LoanList from "@/components/loans/LoanList";
-import { Loan } from "@/lib/types/loan";
-import { getLoans } from "@/lib/actions/loan";
 import AddBalanceSheetDialog from "@/components/balance-sheet/AddBalanceSheet";
+import BalanceSheetList from "@/components/balance-sheet/BalanceSheetList";
+import { BalanceSheet } from "@/lib/types/balanceSheet";
+import { getBalanceSheet } from "@/lib/actions/balanceSheet";
 
 const Page = () => {
-  const [loans, setLoans] = useState<Loan[]>([]);
+  const [balanceSheet, setBalanceSheet] = useState<BalanceSheet[]>([]);
 
-  const fetchLoans = async () => {
+  const fetchBalanceSheet = async () => {
     try {
-      setLoans((await getLoans()) ?? []);
+      setBalanceSheet((await getBalanceSheet()) ?? []);
     } catch (error) {
       console.log(error);
     }
   };
 
   useEffect(() => {
-    fetchLoans();
+    fetchBalanceSheet();
   }, []);
 
   return (
@@ -45,12 +45,12 @@ const Page = () => {
           </Breadcrumb>
           <h1 className="text-4xl font-bold">Balance Sheet</h1>
         </div>
-        <AddBalanceSheetDialog
-          onAdd={() => console.log("hello")}
-          isButton={true}
-        />
+        <AddBalanceSheetDialog onAdd={fetchBalanceSheet} isButton={true} />
       </div>
-      <LoanList showAll={true} loans={loans} onAction={fetchLoans} />
+      <BalanceSheetList
+        balanceSheet={balanceSheet}
+        onAction={fetchBalanceSheet}
+      />
     </main>
   );
 };
