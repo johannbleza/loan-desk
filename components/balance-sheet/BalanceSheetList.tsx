@@ -45,7 +45,7 @@ const BalanceSheetList = ({
         loan_id: payment.loan_id,
         entry_date: payment.payment_date ?? "",
         balance_out: 0,
-        remarks: `Monthly Payment: ${payment.loan?.client?.name}, Term: ${payment.term}/${payment.loan?.term}`,
+        remarks: `Monthly Payment: ${payment.loan?.client?.name}, Term: ${payment.term}`,
         balance_in: payment.monthly_payment,
         isPayment: true,
       })),
@@ -54,12 +54,14 @@ const BalanceSheetList = ({
     return combined;
   }, [entries, loans, payments]);
 
+  const totalIn = data.reduce((sum, p) => sum + (p.balance_in ?? 0), 0);
+  const totalOut = data.reduce((sum, p) => sum + (p.balance_out ?? 0), 0);
+  const totalBalance = totalIn - totalOut;
+
   return (
-    <Card className="">
+    <Card>
       <CardHeader>
-        <h1 className="text-2xl font-semibold">
-          All Entries ({entries.length})
-        </h1>
+        <h1 className="text-2xl font-semibold">All Entries ({data.length})</h1>
       </CardHeader>
       <CardContent>
         <Table>
@@ -99,13 +101,29 @@ const BalanceSheetList = ({
                   )}
                 </TableCell>
                 <TableCell className="flex items-center justify-end text-right">
-                  <BalanceSheetActionsDropdown
-                    entry={entry}
-                    onAction={onAction}
-                  />
+                  {entry.isLoan || entry.isPayment ? (
+                    <Link
+                      href={`/loans/${entry.isLoan ? entry.id : entry.loan_id}`}
+                      className="hover:underline"
+                    >
+                      View
+                    </Link>
+                  ) : (
+                    <BalanceSheetActionsDropdown
+                      entry={entry}
+                      onAction={onAction}
+                    />
+                  )}
                 </TableCell>
               </TableRow>
             ))}
+            <TableRow className="font-bold">
+              <TableCell></TableCell>
+              <TableCell>Total:</TableCell>
+              <TableCell>{formatToPeso(totalIn)}</TableCell>
+              <TableCell>{formatToPeso(totalOut)}</TableCell>
+              <TableCell>{formatToPeso(totalBalance)}</TableCell>
+            </TableRow>
           </TableBody>
         </Table>
       </CardContent>
