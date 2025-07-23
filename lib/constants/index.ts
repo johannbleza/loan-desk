@@ -85,7 +85,7 @@ export const navLinks = [
   {
     icon: FileText,
     name: "Balance Sheet",
-    href: "/balanc-sheet",
+    href: "/balance-sheet",
   },
 ];
 
