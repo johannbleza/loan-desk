@@ -43,6 +43,34 @@ export const generatePaymentSchedule = async (loan: Loan) => {
   if (data) return data;
 };
 
+export const getPaymentsPaid = async () => {
+  try {
+    const { data, error } = await supabase
+      .from("payment")
+      .select(
+        `
+      *,
+      loan(
+        *,
+        client:client_id (name),
+        agent:agent_id (name)
+      )
+    `,
+      )
+      .eq("remarks", "Paid")
+      .order("due_date", { ascending: true });
+
+    if (error) {
+      console.error("Error fetching payments:", error);
+      throw error;
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Failed to get payments:", error);
+    throw error;
+  }
+};
 export const getPayments = async (loan_id?: string) => {
   try {
     let query = supabase

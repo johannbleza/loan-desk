@@ -14,7 +14,10 @@ export const createLoan = async (formData: Loan): Promise<Loan | undefined> => {
   }
 };
 
-export const getLoans = async (client_id?: string, agent_id?: string) => {
+export const getLoans = async (
+  client_id?: string,
+  agent_id?: string,
+): Promise<Loan[]> => {
   try {
     let query = supabase
       .from("loan")

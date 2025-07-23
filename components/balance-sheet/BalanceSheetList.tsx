@@ -8,24 +8,57 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Entry } from "@/lib/types/entry";
-import { format } from "date-fns";
+import { compareAsc, format } from "date-fns";
 import { formatToPeso } from "@/lib/utils";
 import BalanceSheetActionsDropdown from "./EntryActionsDropdown";
+import Link from "next/link";
+import { Loan } from "@/lib/types/loan";
+import { Payment } from "@/lib/types/payment";
+import { useMemo } from "react";
 
 interface BalanceSheetListProps {
-  balanceSheet: Entry[];
+  entries: Entry[];
+  loans: Loan[];
+  payments: Payment[];
   onAction: () => void;
 }
 
 const BalanceSheetList = ({
-  balanceSheet,
+  entries,
+  loans,
+  payments,
   onAction,
 }: BalanceSheetListProps) => {
+  const data: Entry[] = useMemo(() => {
+    const combined: Entry[] = [
+      ...entries,
+      ...loans.map((loan) => ({
+        id: loan.id,
+        entry_date: loan.loan_date,
+        balance_out: loan.loan_amount,
+        remarks: `Loan: L-${loan.id?.slice(-3).toUpperCase()}, ${loan.client?.name}`,
+        balance_in: 0,
+        isLoan: true,
+      })),
+      ...payments.map((payment) => ({
+        id: payment.id,
+        loan_id: payment.loan_id,
+        entry_date: payment.payment_date ?? "",
+        balance_out: 0,
+        remarks: `Monthly Payment: ${payment.loan?.client?.name}, Term: ${payment.term}/${payment.loan?.term}`,
+        balance_in: payment.monthly_payment,
+        isPayment: true,
+      })),
+    ];
+    combined.sort((a, b) => compareAsc(a.entry_date, b.entry_date));
+    return combined;
+  }, [entries, loans, payments]);
+
   return (
-    <Card>
+    <Card className="">
       <CardHeader>
         <h1 className="text-2xl font-semibold">
-          All Entries ({balanceSheet.length})
+          All Entries ({entries.length})
         </h1>
       </CardHeader>
       <CardContent>
@@ -42,7 +75,7 @@ const BalanceSheetList = ({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {balanceSheet.map((entry, index) => (
+            {data.map((entry, index) => (
               <TableRow key={entry.id}>
                 <TableCell className="w-4">{index + 1}</TableCell>
                 <TableCell>
@@ -53,7 +86,18 @@ const BalanceSheetList = ({
                 <TableCell>
                   {formatToPeso(entry.balance_in - entry.balance_out)}
                 </TableCell>
-                <TableCell>{entry.remarks}</TableCell>
+                <TableCell>
+                  {entry.isLoan || entry.isPayment ? (
+                    <Link
+                      href={`/loans/${entry.isLoan ? entry.id : entry.loan_id}`}
+                      className="hover:underline"
+                    >
+                      {entry.remarks}
+                    </Link>
+                  ) : (
+                    entry.remarks
+                  )}
+                </TableCell>
                 <TableCell className="flex items-center justify-end text-right">
                   <BalanceSheetActionsDropdown
                     entry={entry}
