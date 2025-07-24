@@ -1,4 +1,4 @@
-import { Menu, WalletMinimal } from "lucide-react";
+import { LogOutIcon, Menu, WalletMinimal } from "lucide-react";
 import {
   Sheet,
   SheetClose,
@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/sheet";
 import Link from "next/link";
 import { navLinks } from "@/lib/constants";
+import { SignOutButton } from "@clerk/nextjs";
 
 const Navbar = () => {
   return (
@@ -36,6 +37,9 @@ const Navbar = () => {
               </Link>
             );
           })}
+          <SignOutButton>
+            <LogOutIcon className="cursor-pointer size-4" />
+          </SignOutButton>
         </div>
         {/* Mobile View */}
         <Sheet>
@@ -57,6 +61,7 @@ const Navbar = () => {
                     </Link>
                   );
                 })}
+                <SignOutButton />
               </div>
             </SheetHeader>
           </SheetContent>
