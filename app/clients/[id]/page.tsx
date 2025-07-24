@@ -8,7 +8,7 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { LucideMail, Phone, User, UserCheck } from "lucide-react";
 import { getClient } from "@/lib/actions/client";
@@ -28,27 +28,26 @@ const ClientPage = () => {
   const [client, setClient] = useState<Client | null>(null);
   const [loans, setLoans] = useState<Loan[]>([]);
 
-  const fetchLoans = async () => {
+  const fetchLoans = useCallback(async () => {
     try {
       setLoans((await getLoans(id as string)) ?? []);
     } catch (error) {
       console.log(error);
     }
-  };
+  }, [id]);
 
-  const fetchClient = async () => {
+  const fetchClient = useCallback(async () => {
     try {
       setClient(await getClient(id as string));
     } catch (error) {
       console.log(error);
     }
-  };
+  }, [id]);
 
   useEffect(() => {
     fetchClient();
     fetchLoans();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id]);
+  }, [fetchLoans, fetchClient]);
 
   if (client) {
     return (

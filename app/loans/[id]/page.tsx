@@ -8,7 +8,7 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import Link from "next/link";
 import { Loan } from "@/lib/types/loan";
@@ -29,27 +29,18 @@ const LoanPage = () => {
   const [loan, setLoan] = useState<Loan | null>(null);
   const [payments, setPayments] = useState<Payment[]>([]);
 
-  const fetchPayments = async () => {
+  const fetchData = useCallback(async () => {
     try {
       setPayments((await getPayments(id as string)) ?? []);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const fetchLoan = async () => {
-    try {
       setLoan(await getLoan(id as string));
     } catch (error) {
       console.log(error);
     }
-  };
+  }, [id]);
 
   useEffect(() => {
-    fetchLoan();
-    fetchPayments();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id]);
+    fetchData();
+  }, [id, fetchData]);
 
   if (loan) {
     return (
@@ -76,18 +67,11 @@ const LoanPage = () => {
             </h1>
           </div>
           <div className="flex flex-wrap gap-3">
-            <ResetPaymentsDialog loan={loan} onReset={fetchPayments} />
-            <EditLoanDialog
-              loan={loan}
-              onEdit={() => {
-                fetchPayments();
-                fetchLoan();
-              }}
-              isButton={true}
-            />
+            <ResetPaymentsDialog loan={loan} onReset={fetchData} />
+            <EditLoanDialog loan={loan} onEdit={fetchData} isButton={true} />
             <DeleteLoanDialog
               loan={loan}
-              onDelete={fetchLoan}
+              onDelete={fetchData}
               isButton={true}
             />
           </div>
@@ -155,10 +139,7 @@ const LoanPage = () => {
           title="Payment Schedule"
           showTerm={true}
           payments={payments}
-          onAction={() => {
-            fetchLoan();
-            fetchPayments();
-          }}
+          onAction={fetchData}
           showTotal={true}
           showCollected={true}
         />

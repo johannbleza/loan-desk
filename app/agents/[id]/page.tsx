@@ -12,7 +12,7 @@ import EditAgentDialog from "@/components/agents/EditAgentDialog";
 import { getAgent } from "@/lib/actions/agents";
 import { Agent } from "@/lib/types/agent";
 import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import AddClientDialog from "@/components/clients/AddClientDialog";
 import { Card, CardContent } from "@/components/ui/card";
 import { LucideMail, Phone, UserCheck } from "lucide-react";
@@ -27,41 +27,39 @@ const AgentPage = () => {
   const params = useParams();
   const { id } = params;
 
-  const [loans, setLoans] = useState<Loan[]>([]);
-
-  const fetchLoans = async () => {
-    try {
-      setLoans((await getLoans("", id as string)) ?? []);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
   const [agent, setAgent] = useState<Agent | null>(null);
   const [clients, setClients] = useState<Client[]>([]);
+  const [loans, setLoans] = useState<Loan[]>([]);
 
-  const fetchClients = async () => {
-    try {
-      setClients((await getClients(id as string)) ?? []);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const fetchAgent = async () => {
+  const fetchAgent = useCallback(async () => {
     try {
       setAgent(await getAgent(id as string));
     } catch (error) {
       console.log(error);
     }
-  };
+  }, [id]);
+
+  const fetchLoans = useCallback(async () => {
+    try {
+      setLoans((await getLoans("", id as string)) ?? []);
+    } catch (error) {
+      console.log(error);
+    }
+  }, [id]);
+
+  const fetchClients = useCallback(async () => {
+    try {
+      setClients((await getClients(id as string)) ?? []);
+    } catch (error) {
+      console.log(error);
+    }
+  }, [id]);
 
   useEffect(() => {
     fetchAgent();
     fetchClients();
     fetchLoans();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id]);
+  }, [fetchClients, fetchLoans, fetchAgent]);
 
   if (agent) {
     return (
